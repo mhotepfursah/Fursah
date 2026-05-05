@@ -1,3 +1,5 @@
+html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,156 +8,609 @@
 <title>Fursah – Dubai Secondary Market</title>
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── RESET & TOKENS ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --navy: #0D1B2A; --navy-2: #152233;
-  --gold: #C8973A;
-  --surface: #FFFFFF; --surface-2: #F4F2EE;
-  --border: rgba(200,151,58,0.18); --border-sub: rgba(255,255,255,0.07);
-  --text-primary: #0D1B2A; --text-secondary: #4A5A6A; --text-muted: #8A9AAA;
-  --text-white: #F0EDE8;
-  --red: #C0392B; --purple: #6C3483;
+  --navy:#0D1B2A; --navy-2:#152233; --navy-3:#1C2E42;
+  --gold:#C8973A; --gold-dim:rgba(200,151,58,0.15);
+  --surface:#FFFFFF; --surface-2:#F4F2EE; --surface-3:#EEECEA;
+  --border:rgba(200,151,58,0.18); --border-dark:rgba(13,27,42,0.10);
+  --border-sub:rgba(255,255,255,0.07);
+  --text-primary:#0D1B2A; --text-secondary:#4A5A6A; --text-muted:#8A9AAA;
+  --text-white:#F0EDE8;
+  --red:#C0392B; --purple:#6C3483;
+  --green:#27AE60;
+
+  /* Z-INDEX LAYERS — nothing overlaps by accident */
+  --z-map:1;
+  --z-map-controls:10;
+  --z-left-panel:20;
+  --z-overlay:100;      /* filter panel, search dropdown */
+  --z-header:200;       /* always on top */
+  --z-toast:300;
 }
-body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--navy); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-header { height: 54px; background: var(--navy); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; padding: 0 14px; flex-shrink: 0; z-index: 300; position: relative; }
-.logo { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.logo-mark { width: 30px; height: 30px; background: var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: var(--navy); }
-.logo-text { font-size: 15px; font-weight: 800; color: var(--text-white); letter-spacing: 2px; text-transform: uppercase; font-family: Georgia, serif; }
-.logo-tag { font-size: 8px; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; }
-.search-bar { flex: 1; max-width: 340px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 7px; display: flex; align-items: center; gap: 7px; padding: 0 10px; cursor: pointer; }
-.search-bar span { font-size: 11px; color: rgba(255,255,255,0.35); }
-.pills { display: flex; gap: 4px; }
-.pill { height: 25px; padding: 0 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 20px; font-size: 10px; color: rgba(255,255,255,0.55); cursor: pointer; display: flex; align-items: center; white-space: nowrap; transition: all 0.15s; }
-.pill.active { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600; }
-.hdr-right { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
-.meta { font-size: 10px; color: rgba(255,255,255,0.3); border-right: 1px solid var(--border); padding-right: 10px; }
-.icon-btn { width: 30px; height: 30px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255,255,255,0.55); position: relative; transition: all 0.15s; flex-shrink: 0; }
-.icon-btn:hover, .icon-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(200,151,58,0.15); }
-.bdg { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: var(--gold); border-radius: 50%; font-size: 8px; font-weight: 700; color: var(--navy); display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--navy); }
-.content { flex: 1; display: flex; overflow: hidden; position: relative; min-height: 0; }
-.left-panel { width: 292px; flex-shrink: 0; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; transition: width 0.3s ease, opacity 0.3s ease; }
-.left-panel.hidden { width: 0; opacity: 0; pointer-events: none; }
-.ph { padding: 12px 14px 10px; border-bottom: 1px solid rgba(13,27,42,0.08); flex-shrink: 0; }
-.eyebrow { font-size: 9px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-.rcount { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-.rcount span { font-size: 11px; font-weight: 400; color: var(--text-muted); margin-left: 3px; }
-.sort-sel { font-size: 10px; color: var(--text-secondary); border: 1px solid rgba(13,27,42,0.12); background: var(--surface-2); border-radius: 5px; padding: 3px 6px; margin-top: 8px; }
-.list { flex: 1; overflow-y: auto; padding: 8px; background: var(--surface-2); }
-.list::-webkit-scrollbar { width: 3px; }
-.list::-webkit-scrollbar-thumb { background: rgba(200,151,58,0.3); border-radius: 2px; }
-.card { background: var(--surface); border: 1px solid rgba(13,27,42,0.1); border-radius: 12px; margin-bottom: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.15s, transform 0.1s; }
-.card:hover { box-shadow: 0 6px 20px rgba(13,27,42,0.12); transform: translateY(-1px); }
-.card.ft { border-color: var(--gold); border-width: 1.5px; }
-.cimg { height: 82px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-.cbadge { position: absolute; top: 6px; left: 6px; font-size: 8px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; color: #fff; }
-.br { background: var(--red); } .bg { background: var(--gold); color: var(--navy) !important; } .bp { background: var(--purple); }
-.cbody { padding: 8px 10px 10px; }
-.cprice { font-size: 14px; font-weight: 700; color: var(--text-primary); }
-.csub { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; }
-.ctitle { font-size: 11px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cloc { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
-.cspecs { display: flex; gap: 10px; padding-top: 6px; border-top: 1px solid rgba(13,27,42,0.07); font-size: 9px; color: var(--text-secondary); }
-.cagent { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(13,27,42,0.07); }
-.arow { display: flex; align-items: center; gap: 5px; }
-.av { width: 20px; height: 20px; border-radius: 50%; background: var(--navy-2); display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; color: var(--gold); border: 1px solid rgba(200,151,58,0.3); }
-.aname { font-size: 10px; color: var(--text-secondary); }
-.vbadge { font-size: 9px; color: #27AE60; font-weight: 600; }
-.map-wrap { flex: 1; position: relative; min-width: 0; }
-#map { width: 100%; height: 100%; }
-.ctrl-tr { position: absolute; top: 10px; right: 10px; z-index: 10; display: flex; flex-direction: column; gap: 5px; }
-.ctrl-br { position: absolute; bottom: 28px; right: 10px; z-index: 10; }
-.cg { background: var(--navy-2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-.cb { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255,255,255,0.6); border: none; background: transparent; font-size: 14px; transition: all 0.15s; }
-.cb:hover { background: rgba(200,151,58,0.12); color: var(--gold); }
-.cb + .cb { border-top: 1px solid var(--border); }
-.mlogo { position: absolute; bottom: 10px; left: 10px; z-index: 10; background: var(--navy-2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; display: flex; align-items: center; gap: 6px; }
-.mlm { width: 18px; height: 18px; background: var(--gold); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--navy); }
-.mlt { font-size: 11px; font-weight: 700; color: var(--text-white); letter-spacing: 1px; text-transform: uppercase; font-family: Georgia, serif; }
-.style-label { position: absolute; top: 10px; left: 10px; z-index: 10; background: var(--navy-2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 10px; color: rgba(255,255,255,0.6); pointer-events: none; }
-.threed-label { position: absolute; top: 52px; left: 10px; z-index: 10; background: rgba(200,151,58,0.2); border: 1px solid var(--gold); border-radius: 20px; padding: 4px 10px; font-size: 10px; color: var(--gold); pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-.threed-label.visible { opacity: 1; }
-.lpanel { position: absolute; top: 10px; right: 52px; background: var(--navy-2); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.4); padding: 12px; width: 195px; z-index: 20; display: none; }
-.lpanel.open { display: block; }
-.lhead { font-size: 9px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
-.li { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; font-size: 11px; color: rgba(255,255,255,0.7); border-bottom: 1px solid var(--border-sub); }
-.li:last-child { border-bottom: none; }
-.ll { display: flex; align-items: center; gap: 7px; }
-.ld { width: 8px; height: 8px; border-radius: 50%; }
-.tog { width: 28px; height: 16px; border-radius: 8px; background: var(--gold); position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-.tog::after { content: ''; position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: all 0.15s; }
-.tog.off { background: rgba(255,255,255,0.15); }
-.tog.off::after { right: auto; left: 2px; }
-.grid-view { display: none; position: fixed; top: 54px; left: 0; right: 0; bottom: 0; background: var(--surface-2); z-index: 100; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; }
-.grid-view.active { display: block; }
-.grid-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.grid-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-.grid-count { font-size: 12px; color: var(--text-muted); }
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.grid-card { background: var(--surface); border: 1px solid rgba(13,27,42,0.1); border-radius: 12px; overflow: hidden; cursor: pointer; transition: box-shadow 0.15s, transform 0.1s; }
-.grid-card:hover { box-shadow: 0 6px 20px rgba(13,27,42,0.12); transform: translateY(-2px); }
-.grid-card.ft { border-color: var(--gold); border-width: 1.5px; }
-.gc-img { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 36px; position: relative; }
-.gc-body { padding: 10px 12px 12px; }
-.gc-price { font-size: 15px; font-weight: 700; color: var(--text-primary); }
-.gc-sub { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
-.gc-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-.gc-loc { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
-.gc-specs { display: flex; gap: 10px; padding-top: 8px; border-top: 1px solid rgba(13,27,42,0.07); font-size: 10px; color: var(--text-secondary); }
-.gc-agent { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(13,27,42,0.07); }
+html, body { height:100%; overflow:hidden; font-family:'Segoe UI',system-ui,sans-serif; background:var(--navy); color:var(--text-primary); }
+
+/* ─────────────────────────────────────
+   HEADER  z=200
+───────────────────────────────────── */
+header {
+  position:relative; z-index:var(--z-header);
+  height:54px; background:var(--navy);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; padding:0 14px;
+  flex-shrink:0;
+}
+.logo { display:flex; align-items:center; gap:8px; flex-shrink:0; text-decoration:none; }
+.logo-mark { width:30px; height:30px; background:var(--gold); border-radius:7px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--navy); }
+.logo-text { font-size:15px; font-weight:800; color:var(--text-white); letter-spacing:2px; text-transform:uppercase; font-family:Georgia,serif; }
+.logo-tag { font-size:8px; color:var(--gold); letter-spacing:1.5px; text-transform:uppercase; }
+
+/* Search bar */
+.search-wrap { flex:1; max-width:320px; position:relative; }
+.search-bar {
+  width:100%; height:32px;
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:7px; display:flex; align-items:center; gap:7px; padding:0 10px;
+  cursor:text; transition:border-color .15s;
+}
+.search-bar:focus-within { border-color:var(--gold); }
+.search-bar input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-size:11px; color:var(--text-white);
+}
+.search-bar input::placeholder { color:rgba(255,255,255,0.35); }
+
+/* Header action buttons */
+.hdr-actions { display:flex; align-items:center; gap:4px; }
+.hdr-btn {
+  height:28px; padding:0 10px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:20px; font-size:10px; color:rgba(255,255,255,0.65);
+  cursor:pointer; display:flex; align-items:center; gap:5px;
+  white-space:nowrap; transition:all .15s; flex-shrink:0;
+}
+.hdr-btn:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+.hdr-btn.active { background:var(--gold); border-color:var(--gold); color:var(--navy); font-weight:600; }
+.hdr-btn svg { width:12px; height:12px; flex-shrink:0; }
+.filter-count {
+  width:16px; height:16px; background:var(--gold); border-radius:50%;
+  font-size:9px; font-weight:700; color:var(--navy);
+  display:none; align-items:center; justify-content:center;
+}
+.filter-count.show { display:flex; }
+
+.hdr-right { display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0; }
+.meta { font-size:10px; color:rgba(255,255,255,0.3); border-right:1px solid var(--border); padding-right:8px; }
+.icon-btn {
+  width:30px; height:30px; background:rgba(255,255,255,0.04);
+  border:1px solid var(--border); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:rgba(255,255,255,0.55); position:relative; transition:all .15s;
+}
+.icon-btn:hover,.icon-btn.active { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+.icon-btn svg { width:13px; height:13px; }
+.bdg {
+  position:absolute; top:-4px; right:-4px;
+  width:14px; height:14px; background:var(--gold); border-radius:50%;
+  font-size:8px; font-weight:700; color:var(--navy);
+  display:flex; align-items:center; justify-content:center;
+  border:1.5px solid var(--navy);
+}
+
+/* ─────────────────────────────────────
+   MAIN LAYOUT
+───────────────────────────────────── */
+.app-body { flex:1; display:flex; overflow:hidden; position:relative; }
+
+/* ─────────────────────────────────────
+   LEFT PANEL  z=20
+───────────────────────────────────── */
+.left-panel {
+  position:relative; z-index:var(--z-left-panel);
+  width:292px; flex-shrink:0;
+  background:var(--surface);
+  display:flex; flex-direction:column; overflow:hidden;
+  transition:width .3s ease, opacity .3s ease;
+}
+.left-panel.hidden { width:0; opacity:0; pointer-events:none; }
+
+.ph { padding:12px 14px 10px; border-bottom:1px solid var(--border-dark); flex-shrink:0; }
+.eyebrow { font-size:9px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; }
+.rcount { font-size:18px; font-weight:700; color:var(--text-primary); }
+.rcount span { font-size:11px; font-weight:400; color:var(--text-muted); margin-left:3px; }
+.sort-sel { font-size:10px; color:var(--text-secondary); border:1px solid var(--border-dark); background:var(--surface-2); border-radius:5px; padding:3px 6px; margin-top:8px; width:100%; }
+
+.listings-list { flex:1; overflow-y:auto; padding:8px; background:var(--surface-2); }
+.listings-list::-webkit-scrollbar { width:3px; }
+.listings-list::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.3); border-radius:2px; }
+
+/* Listing cards */
+.card { background:var(--surface); border:1px solid var(--border-dark); border-radius:12px; margin-bottom:8px; overflow:hidden; cursor:pointer; transition:box-shadow .15s, transform .1s; }
+.card:hover { box-shadow:0 6px 20px rgba(13,27,42,0.12); transform:translateY(-1px); }
+.card.ft { border-color:var(--gold); border-width:1.5px; }
+.cimg { height:82px; position:relative; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.cbadge { position:absolute; top:6px; left:6px; font-size:8px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase; color:#fff; }
+.br { background:var(--red); } .bg { background:var(--gold); color:var(--navy)!important; } .bp { background:var(--purple); }
+.cbody { padding:8px 10px 10px; }
+.cprice { font-size:14px; font-weight:700; color:var(--text-primary); }
+.csub { font-size:9px; color:var(--text-muted); margin-bottom:4px; }
+.ctitle { font-size:11px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cloc { font-size:10px; color:var(--text-muted); margin-bottom:6px; }
+.cspecs { display:flex; gap:10px; padding-top:6px; border-top:1px solid rgba(13,27,42,0.07); font-size:9px; color:var(--text-secondary); }
+.cagent { display:flex; align-items:center; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:1px solid rgba(13,27,42,0.07); }
+.arow { display:flex; align-items:center; gap:5px; }
+.av { width:20px; height:20px; border-radius:50%; background:var(--navy-2); display:flex; align-items:center; justify-content:center; font-size:7px; font-weight:700; color:var(--gold); border:1px solid rgba(200,151,58,0.3); }
+.aname { font-size:10px; color:var(--text-secondary); }
+.vbadge { font-size:9px; color:var(--green); font-weight:600; }
+
+/* ─────────────────────────────────────
+   MAP  z=1
+───────────────────────────────────── */
+.map-wrap { flex:1; position:relative; z-index:var(--z-map); min-width:0; }
+#map { width:100%; height:100%; }
+
+/* Map controls z=10 */
+.ctrl-tr { position:absolute; top:10px; right:10px; z-index:var(--z-map-controls); display:flex; flex-direction:column; gap:5px; }
+.ctrl-br { position:absolute; bottom:28px; right:10px; z-index:var(--z-map-controls); }
+.cg { background:var(--navy-2); border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+.cb { width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(255,255,255,0.6); border:none; background:transparent; font-size:14px; transition:all .15s; }
+.cb:hover { background:rgba(200,151,58,0.12); color:var(--gold); }
+.cb+.cb { border-top:1px solid var(--border); }
+.style-label { position:absolute; top:10px; left:10px; z-index:var(--z-map-controls); background:var(--navy-2); border:1px solid var(--border); border-radius:20px; padding:4px 10px; font-size:10px; color:rgba(255,255,255,0.6); pointer-events:none; }
+.threed-label { position:absolute; top:42px; left:10px; z-index:var(--z-map-controls); background:rgba(200,151,58,0.2); border:1px solid var(--gold); border-radius:20px; padding:4px 10px; font-size:10px; color:var(--gold); pointer-events:none; opacity:0; transition:opacity .3s; }
+.threed-label.visible { opacity:1; }
+.mlogo { position:absolute; bottom:10px; left:10px; z-index:var(--z-map-controls); background:var(--navy-2); border:1px solid var(--border); border-radius:8px; padding:5px 9px; display:flex; align-items:center; gap:6px; }
+.mlm { width:18px; height:18px; background:var(--gold); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--navy); }
+.mlt { font-size:11px; font-weight:700; color:var(--text-white); letter-spacing:1px; text-transform:uppercase; font-family:Georgia,serif; }
+
+/* Map layers panel */
+.map-lpanel { position:absolute; top:10px; right:52px; z-index:var(--z-map-controls); background:var(--navy-2); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,0.4); padding:12px; width:195px; display:none; }
+.map-lpanel.open { display:block; }
+.lhead { font-size:9px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+.mli { display:flex; align-items:center; justify-content:space-between; padding:5px 0; font-size:11px; color:rgba(255,255,255,0.7); border-bottom:1px solid var(--border-sub); }
+.mli:last-child { border-bottom:none; }
+.mll { display:flex; align-items:center; gap:7px; }
+.mld { width:8px; height:8px; border-radius:50%; }
+.tog { width:28px; height:16px; border-radius:8px; background:var(--gold); position:relative; cursor:pointer; flex-shrink:0; transition:background .2s; }
+.tog::after { content:''; position:absolute; top:2px; right:2px; width:12px; height:12px; background:#fff; border-radius:50%; transition:all .15s; }
+.tog.off { background:rgba(255,255,255,0.15); }
+.tog.off::after { right:auto; left:2px; }
+
+/* ─────────────────────────────────────
+   OVERLAY BACKDROP  z=99
+   (sits behind panels but above everything else)
+───────────────────────────────────── */
+.overlay-backdrop {
+  display:none; position:fixed;
+  top:54px; left:0; right:0; bottom:0;
+  background:rgba(13,27,42,0.45);
+  z-index:99;
+  backdrop-filter:blur(1px);
+}
+.overlay-backdrop.show { display:block; }
+
+/* ─────────────────────────────────────
+   FILTER PANEL  z=100
+   Slides in from the left, sits above backdrop
+───────────────────────────────────── */
+.filter-panel {
+  position:fixed;
+  top:54px; left:0; bottom:0;
+  width:340px;
+  background:var(--surface);
+  z-index:var(--z-overlay);
+  display:flex; flex-direction:column;
+  transform:translateX(-100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  box-shadow:4px 0 24px rgba(0,0,0,0.2);
+}
+.filter-panel.open { transform:translateX(0); }
+
+.fp-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px; border-bottom:1px solid var(--border-dark);
+  flex-shrink:0; background:var(--navy);
+}
+.fp-title { font-size:15px; font-weight:700; color:var(--text-white); }
+.fp-close {
+  width:28px; height:28px; background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:rgba(255,255,255,0.7); font-size:16px;
+  transition:all .15s;
+}
+.fp-close:hover { background:rgba(255,255,255,0.15); color:#fff; }
+
+.fp-body { flex:1; overflow-y:auto; padding:0; }
+.fp-body::-webkit-scrollbar { width:3px; }
+.fp-body::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.3); border-radius:2px; }
+
+.fp-footer {
+  padding:12px 16px; border-top:1px solid var(--border-dark);
+  display:flex; gap:8px; flex-shrink:0; background:var(--surface);
+}
+.fp-btn {
+  flex:1; height:38px; border-radius:8px; font-size:13px; font-weight:600;
+  cursor:pointer; border:none; transition:all .15s;
+}
+.fp-btn.secondary { background:var(--surface-2); color:var(--text-secondary); border:1px solid var(--border-dark); }
+.fp-btn.secondary:hover { background:var(--surface-3); }
+.fp-btn.primary { background:var(--navy); color:var(--text-white); }
+.fp-btn.primary:hover { background:var(--navy-2); }
+
+/* Filter sections */
+.fs { padding:16px; border-bottom:1px solid var(--border-dark); }
+.fs:last-child { border-bottom:none; }
+.fs-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.fs-title { font-size:12px; font-weight:700; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.5px; }
+.fs-reset { font-size:11px; color:var(--gold); cursor:pointer; font-weight:500; }
+.fs-reset:hover { text-decoration:underline; }
+
+/* Distress badge at top of filter */
+.distress-banner {
+  margin:16px 16px 0; padding:10px 12px;
+  background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.25);
+  border-radius:8px; display:flex; align-items:center; gap:8px;
+}
+.distress-dot { width:8px; height:8px; border-radius:50%; background:var(--red); flex-shrink:0; }
+.distress-text { font-size:11px; color:var(--red); font-weight:600; }
+
+/* Chip selectors */
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip {
+  padding:5px 12px; border-radius:20px; font-size:11px; font-weight:500;
+  border:1.5px solid var(--border-dark); background:var(--surface);
+  cursor:pointer; color:var(--text-secondary); transition:all .15s;
+  white-space:nowrap;
+}
+.chip:hover { border-color:var(--gold); color:var(--gold); }
+.chip.selected { background:var(--navy); border-color:var(--navy); color:#fff; }
+
+/* Location search inside filter */
+.loc-search {
+  width:100%; height:34px; background:var(--surface-2);
+  border:1px solid var(--border-dark); border-radius:7px;
+  display:flex; align-items:center; gap:7px; padding:0 10px;
+  margin-bottom:12px;
+}
+.loc-search input { flex:1; background:transparent; border:none; outline:none; font-size:11px; color:var(--text-primary); }
+.loc-search input::placeholder { color:var(--text-muted); }
+
+/* Price range inputs */
+.price-row { display:flex; gap:8px; align-items:center; }
+.price-input-wrap { flex:1; }
+.price-label { font-size:9px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+.price-input {
+  width:100%; height:34px; background:var(--surface-2);
+  border:1px solid var(--border-dark); border-radius:7px;
+  padding:0 10px; font-size:11px; color:var(--text-primary); outline:none;
+  transition:border-color .15s;
+}
+.price-input:focus { border-color:var(--gold); }
+.price-sep { font-size:12px; color:var(--text-muted); margin-top:18px; flex-shrink:0; }
+
+/* Range slider */
+.range-wrap { position:relative; padding:4px 0; }
+input[type=range] {
+  -webkit-appearance:none; width:100%; height:4px;
+  background:var(--surface-3); border-radius:2px; outline:none;
+  cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px;
+  border-radius:50%; background:var(--navy); border:2px solid var(--gold);
+  cursor:pointer; transition:transform .1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
+
+/* Below market chips */
+.bm-chips { display:flex; gap:6px; flex-wrap:wrap; }
+
+/* Toggle row */
+.tog-row { display:flex; align-items:center; justify-content:space-between; padding:4px 0; }
+.tog-label { font-size:12px; color:var(--text-primary); }
+.tog-sub { font-size:10px; color:var(--text-muted); margin-top:1px; }
+
+/* ─────────────────────────────────────
+   SEARCH DROPDOWN  z=100
+───────────────────────────────────── */
+.search-dropdown {
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  background:var(--navy-2); border:1px solid var(--border);
+  border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  z-index:var(--z-overlay); overflow:hidden;
+  display:none;
+}
+.search-dropdown.open { display:block; }
+.sd-section { padding:8px 0; }
+.sd-label { font-size:9px; font-weight:700; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; padding:4px 12px 6px; }
+.sd-item { display:flex; align-items:center; gap:10px; padding:8px 12px; cursor:pointer; transition:background .1s; }
+.sd-item:hover { background:rgba(255,255,255,0.06); }
+.sd-icon { width:28px; height:28px; background:rgba(255,255,255,0.06); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.sd-name { font-size:12px; color:var(--text-white); font-weight:500; }
+.sd-sub { font-size:10px; color:rgba(255,255,255,0.4); }
+.sd-divider { height:1px; background:var(--border-sub); margin:0 12px; }
+
+/* ─────────────────────────────────────
+   GRID VIEW  z=100 fixed overlay
+───────────────────────────────────── */
+.grid-view {
+  display:none; position:fixed;
+  top:54px; left:0; right:0; bottom:0;
+  background:var(--surface-2); z-index:var(--z-overlay);
+  overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px;
+}
+.grid-view.active { display:block; }
+.grid-view::-webkit-scrollbar { width:4px; }
+.grid-view::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.3); border-radius:2px; }
+.grid-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.grid-title { font-size:16px; font-weight:700; color:var(--text-primary); }
+.grid-count { font-size:12px; color:var(--text-muted); }
+.grid-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; padding-bottom:24px; }
+.grid-card { background:var(--surface); border:1px solid var(--border-dark); border-radius:12px; overflow:hidden; cursor:pointer; transition:box-shadow .15s,transform .1s; }
+.grid-card:hover { box-shadow:0 6px 20px rgba(13,27,42,0.12); transform:translateY(-2px); }
+.grid-card.ft { border-color:var(--gold); border-width:1.5px; }
+.gc-img { height:130px; display:flex; align-items:center; justify-content:center; font-size:36px; position:relative; }
+.gc-body { padding:10px 12px 12px; }
+.gc-price { font-size:15px; font-weight:700; color:var(--text-primary); }
+.gc-sub { font-size:10px; color:var(--text-muted); margin-bottom:4px; }
+.gc-title { font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:2px; }
+.gc-loc { font-size:10px; color:var(--text-muted); margin-bottom:8px; }
+.gc-specs { display:flex; gap:10px; padding-top:8px; border-top:1px solid var(--border-dark); font-size:10px; color:var(--text-secondary); }
+.gc-agent { display:flex; align-items:center; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-dark); }
 </style>
 </head>
-<body>
+<body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
 
+<!-- ── HEADER ── -->
 <header>
   <div class="logo">
     <div class="logo-mark">F</div>
     <div><div class="logo-text">Fursah</div><div class="logo-tag">Verified Agents Only</div></div>
   </div>
-  <div class="search-bar">
-    <svg width="12" height="12" fill="rgba(200,151,58,0.7)" viewBox="0 0 24 24"><path d="M10 5a5 5 0 1 0 0 10A5 5 0 0 0 10 5m-7 5a7 7 0 1 1 14 0A7 7 0 0 1 3 10"/><path d="M13.793 13.793a1 1 0 0 1 1.414 0l5.5 5.5a1 1 0 0 1-1.414 1.414l-5.5-5.5a1 1 0 0 1 0-1.414"/></svg>
-    <span>Search area, project, community…</span>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <svg width="12" height="12" fill="rgba(200,151,58,0.7)" viewBox="0 0 24 24"><path d="M10 5a5 5 0 1 0 0 10A5 5 0 0 0 10 5m-7 5a7 7 0 1 1 14 0A7 7 0 0 1 3 10"/><path d="M13.793 13.793a1 1 0 0 1 1.414 0l5.5 5.5a1 1 0 0 1-1.414 1.414l-5.5-5.5a1 1 0 0 1 0-1.414"/></svg>
+      <input id="searchInput" type="text" placeholder="Search area, project, community…" autocomplete="off">
+    </div>
+    <!-- Search dropdown -->
+    <div class="search-dropdown" id="searchDropdown">
+      <div class="sd-section">
+        <div class="sd-label">Areas</div>
+        <div class="sd-item" onclick="selectSearch('Downtown Dubai')"><div class="sd-icon">📍</div><div><div class="sd-name">Downtown Dubai</div><div class="sd-sub">Burj Khalifa District</div></div></div>
+        <div class="sd-item" onclick="selectSearch('Dubai Marina')"><div class="sd-icon">📍</div><div><div class="sd-name">Dubai Marina</div><div class="sd-sub">Marina Walk, JBR</div></div></div>
+        <div class="sd-item" onclick="selectSearch('Business Bay')"><div class="sd-icon">📍</div><div><div class="sd-name">Business Bay</div><div class="sd-sub">Canal District</div></div></div>
+        <div class="sd-item" onclick="selectSearch('Jumeirah Village Circle')"><div class="sd-icon">📍</div><div><div class="sd-name">Jumeirah Village Circle</div><div class="sd-sub">JVC</div></div></div>
+        <div class="sd-item" onclick="selectSearch('Palm Jumeirah')"><div class="sd-icon">📍</div><div><div class="sd-name">Palm Jumeirah</div><div class="sd-sub">The Palm</div></div></div>
+      </div>
+      <div class="sd-divider"></div>
+      <div class="sd-section">
+        <div class="sd-label">Projects</div>
+        <div class="sd-item" onclick="selectSearch('Emaar Beachfront')"><div class="sd-icon">🏗️</div><div><div class="sd-name">Emaar Beachfront</div><div class="sd-sub">Dubai Harbour</div></div></div>
+        <div class="sd-item" onclick="selectSearch('Creek Harbour')"><div class="sd-icon">🏗️</div><div><div class="sd-name">Creek Harbour</div><div class="sd-sub">Dubai Creek</div></div></div>
+      </div>
+    </div>
   </div>
-  <div class="pills">
-    <div class="pill active">Location</div>
-    <div class="pill">Property type</div>
-    <div class="pill">Budget</div>
-    <div class="pill">Filters</div>
+
+  <!-- Header action buttons -->
+  <div class="hdr-actions">
+    <button class="hdr-btn" id="filterBtn" onclick="toggleFilters()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      Filters
+      <span class="filter-count" id="filterCount">0</span>
+    </button>
+    <button class="hdr-btn" id="clearBtn" onclick="clearAllFilters()" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Clear
+    </button>
   </div>
+
   <div class="hdr-right">
     <div class="meta">AED | sqft</div>
-    <div class="icon-btn" id="viewBtn" title="Change view" onclick="cycleView()" style="cursor:pointer;">
+    <!-- View cycle -->
+    <div class="icon-btn" id="viewBtn" onclick="cycleView()" title="Change view">
       <svg id="viewIcon" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
         <path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/>
       </svg>
     </div>
-    <div class="icon-btn"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V6z"/></svg><div class="bdg">3</div></div>
-    <div class="icon-btn"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 4 4 4-6"/></svg></div>
+    <div class="icon-btn"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V6z"/></svg><div class="bdg">3</div></div>
+    <div class="icon-btn"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 4 4 4-6"/></svg></div>
   </div>
 </header>
 
-<div class="content">
+<!-- ── OVERLAY BACKDROP ── -->
+<div class="overlay-backdrop" id="backdrop" onclick="closeAllOverlays()"></div>
+
+<!-- ── FILTER PANEL ── -->
+<div class="filter-panel" id="filterPanel">
+  <div class="fp-header">
+    <span class="fp-title">Filters</span>
+    <div class="fp-close" onclick="toggleFilters()">✕</div>
+  </div>
+
+  <div class="fp-body">
+
+    <!-- Distress banner -->
+    <div class="distress-banner">
+      <div class="distress-dot"></div>
+      <div class="distress-text">All listings are verified distress deals</div>
+    </div>
+
+    <!-- Deal Stage -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Deal Stage</div>
+        <div class="fs-reset" onclick="resetSection('dealStage')">Reset</div>
+      </div>
+      <div class="chips" id="dealStage">
+        <div class="chip selected" data-value="ready" onclick="toggleChip(this,'dealStage')">Ready</div>
+        <div class="chip selected" data-value="offplan" onclick="toggleChip(this,'dealStage')">Off-Plan</div>
+        <div class="chip selected" data-value="motivated" onclick="toggleChip(this,'dealStage')">Motivated Seller</div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Location</div>
+        <div class="fs-reset" onclick="resetSection('location')">Reset</div>
+      </div>
+      <div class="loc-search">
+        <svg width="12" height="12" fill="var(--text-muted)" viewBox="0 0 24 24"><path d="M10 5a5 5 0 1 0 0 10A5 5 0 0 0 10 5m-7 5a7 7 0 1 1 14 0A7 7 0 0 1 3 10"/></svg>
+        <input type="text" placeholder="Search for area or community…" oninput="filterLocations(this.value)">
+      </div>
+      <div class="chips" id="location">
+        <div class="chip" data-value="downtown" onclick="toggleChip(this,'location')">Downtown Dubai</div>
+        <div class="chip" data-value="marina" onclick="toggleChip(this,'location')">Dubai Marina</div>
+        <div class="chip" data-value="businessbay" onclick="toggleChip(this,'location')">Business Bay</div>
+        <div class="chip" data-value="jvc" onclick="toggleChip(this,'location')">JVC</div>
+        <div class="chip" data-value="palm" onclick="toggleChip(this,'location')">Palm Jumeirah</div>
+        <div class="chip" data-value="jbr" onclick="toggleChip(this,'location')">JBR</div>
+        <div class="chip" data-value="difc" onclick="toggleChip(this,'location')">DIFC</div>
+        <div class="chip" data-value="creek" onclick="toggleChip(this,'location')">Creek Harbour</div>
+        <div class="chip" data-value="hills" onclick="toggleChip(this,'location')">Dubai Hills</div>
+        <div class="chip" data-value="arabian" onclick="toggleChip(this,'location')">Arabian Ranches</div>
+        <div class="chip" data-value="meydan" onclick="toggleChip(this,'location')">Meydan</div>
+        <div class="chip" data-value="sobha" onclick="toggleChip(this,'location')">Sobha Hartland</div>
+      </div>
+    </div>
+
+    <!-- Below Market % — Fursah's killer filter -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Below Market %</div>
+        <div class="fs-reset" onclick="resetSection('belowMarket')">Reset</div>
+      </div>
+      <div class="chips bm-chips" id="belowMarket">
+        <div class="chip" data-value="5" onclick="toggleChipSingle(this,'belowMarket')">5%+</div>
+        <div class="chip" data-value="10" onclick="toggleChipSingle(this,'belowMarket')">10%+</div>
+        <div class="chip" data-value="15" onclick="toggleChipSingle(this,'belowMarket')">15%+</div>
+        <div class="chip" data-value="20" onclick="toggleChipSingle(this,'belowMarket')">20%+</div>
+        <div class="chip" data-value="25" onclick="toggleChipSingle(this,'belowMarket')">25%+</div>
+      </div>
+    </div>
+
+    <!-- Price Range -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Price (AED)</div>
+        <div class="fs-reset" onclick="resetPrice()">Reset</div>
+      </div>
+      <div class="price-row">
+        <div class="price-input-wrap">
+          <div class="price-label">From</div>
+          <input class="price-input" id="priceMin" type="number" placeholder="0" min="0" oninput="updateFilterCount()">
+        </div>
+        <div class="price-sep">—</div>
+        <div class="price-input-wrap">
+          <div class="price-label">To</div>
+          <input class="price-input" id="priceMax" type="number" placeholder="10,000,000" min="0" oninput="updateFilterCount()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Price per sqft -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Price per sqft (AED)</div>
+        <div class="fs-reset" onclick="resetPsf()">Reset</div>
+      </div>
+      <div class="price-row">
+        <div class="price-input-wrap">
+          <div class="price-label">From</div>
+          <input class="price-input" id="psfMin" type="number" placeholder="0" min="0" oninput="updateFilterCount()">
+        </div>
+        <div class="price-sep">—</div>
+        <div class="price-input-wrap">
+          <div class="price-label">To</div>
+          <input class="price-input" id="psfMax" type="number" placeholder="5,000" min="0" oninput="updateFilterCount()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bedrooms -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Bedrooms</div>
+        <div class="fs-reset" onclick="resetSection('bedrooms')">Reset</div>
+      </div>
+      <div class="chips" id="bedrooms">
+        <div class="chip" data-value="studio" onclick="toggleChip(this,'bedrooms')">Studio</div>
+        <div class="chip" data-value="1" onclick="toggleChip(this,'bedrooms')">1</div>
+        <div class="chip" data-value="2" onclick="toggleChip(this,'bedrooms')">2</div>
+        <div class="chip" data-value="3" onclick="toggleChip(this,'bedrooms')">3</div>
+        <div class="chip" data-value="4" onclick="toggleChip(this,'bedrooms')">4</div>
+        <div class="chip" data-value="5" onclick="toggleChip(this,'bedrooms')">5+</div>
+      </div>
+    </div>
+
+    <!-- Unit Type -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Unit Type</div>
+        <div class="fs-reset" onclick="resetSection('unitType')">Reset</div>
+      </div>
+      <div class="chips" id="unitType">
+        <div class="chip" data-value="apartment" onclick="toggleChip(this,'unitType')">Apartment</div>
+        <div class="chip" data-value="villa" onclick="toggleChip(this,'unitType')">Villa</div>
+        <div class="chip" data-value="townhouse" onclick="toggleChip(this,'unitType')">Townhouse</div>
+        <div class="chip" data-value="penthouse" onclick="toggleChip(this,'unitType')">Penthouse</div>
+        <div class="chip" data-value="duplex" onclick="toggleChip(this,'unitType')">Duplex</div>
+      </div>
+    </div>
+
+    <!-- Payment Plan -->
+    <div class="fs">
+      <div class="fs-head">
+        <div class="fs-title">Payment Plan</div>
+        <div class="fs-reset" onclick="resetSection('paymentPlan')">Reset</div>
+      </div>
+      <div class="chips" id="paymentPlan">
+        <div class="chip" data-value="cash" onclick="toggleChip(this,'paymentPlan')">Cash only</div>
+        <div class="chip" data-value="posthandover" onclick="toggleChip(this,'paymentPlan')">Post-handover</div>
+        <div class="chip" data-value="mortgage" onclick="toggleChip(this,'paymentPlan')">Mortgage-friendly</div>
+      </div>
+    </div>
+
+  </div><!-- end fp-body -->
+
+  <div class="fp-footer">
+    <button class="fp-btn secondary" onclick="clearAllFilters()">Reset all</button>
+    <button class="fp-btn primary" onclick="applyFilters()">Show results</button>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="app-body">
+
+  <!-- Left panel -->
   <div class="left-panel" id="leftPanel">
     <div class="ph">
       <div class="eyebrow">Secondary Market</div>
-      <div class="rcount">247 <span>listings found</span></div>
-      <select class="sort-sel"><option>Newest first</option><option>Price: Low–High</option><option>Price: High–Low</option></select>
+      <div class="rcount" id="resultCount">247 <span>listings found</span></div>
+      <select class="sort-sel"><option>Newest first</option><option>Price: Low–High</option><option>Price: High–Low</option><option>Most below market</option></select>
     </div>
-    <div class="list">
-      <div class="card ft"><div class="cimg" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br">Distress Deal</div></div><div class="cbody"><div class="cprice">AED 2,100,000</div><div class="csub">AED 1,890/sqft · 18% below market</div><div class="ctitle">2BR Apartment · Downtown Dubai</div><div class="cloc">Burj Khalifa District</div><div class="cspecs"><span>2 Bed</span><span>2 Bath</span><span>1,112 sqft</span></div><div class="cagent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1A3A2A,#0D1B2A)">🌊<div class="cbadge bg">Motivated Seller</div></div><div class="cbody"><div class="cprice">AED 4,750,000</div><div class="csub">AED 2,280/sqft · 40/60 post-handover</div><div class="ctitle">3BR+M Villa · Palm Jumeirah</div><div class="cloc">Palm Jumeirah, Frond G</div><div class="cspecs"><span>3 Bed</span><span>4 Bath</span><span>2,082 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#4CAF50">SK</div><div class="aname">Sara K.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#2A1A3A,#0D1B2A)">🏗️<div class="cbadge bp">Off-Plan Resale</div></div><div class="cbody"><div class="cprice">AED 1,380,000</div><div class="csub">AED 1,640/sqft · 60% paid</div><div class="ctitle">1BR · Business Bay</div><div class="cloc">Business Bay, Canal View</div><div class="cspecs"><span>1 Bed</span><span>2 Bath</span><span>841 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#9B59B6">AR</div><div class="aname">Ahmed R.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1A2A3A,#0D1B2A)">🏢<div class="cbadge br">Distress Deal</div></div><div class="cbody"><div class="cprice">AED 890,000</div><div class="csub">AED 1,420/sqft · 22% below market</div><div class="ctitle">Studio · JVC</div><div class="cloc">Jumeirah Village Circle</div><div class="cspecs"><span>Studio</span><span>1 Bath</span><span>627 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#3498DB">LM</div><div class="aname">Lena M.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#2A2A1A,#0D1B2A)">🌴<div class="cbadge bg">Motivated Seller</div></div><div class="cbody"><div class="cprice">AED 3,200,000</div><div class="csub">AED 1,950/sqft · Vacant</div><div class="ctitle">3BR Townhouse · Arabian Ranches 2</div><div class="cloc">Arabian Ranches 2</div><div class="cspecs"><span>3 Bed</span><span>3 Bath</span><span>1,641 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#E74C3C">NP</div><div class="aname">Natalia P.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br">Distress Deal</div></div><div class="cbody"><div class="cprice">AED 1,600,000</div><div class="csub">AED 1,720/sqft · 15% below market</div><div class="ctitle">2BR · Al Barsha</div><div class="cloc">Al Barsha 1</div><div class="cspecs"><span>2 Bed</span><span>2 Bath</span><span>930 sqft</span></div><div class="cagent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+    <div class="listings-list">
+      <div class="card ft"><div class="cimg" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br">Ready</div></div><div class="cbody"><div class="cprice">AED 2,100,000</div><div class="csub">AED 1,890/sqft · 18% below market</div><div class="ctitle">2BR Apartment · Downtown Dubai</div><div class="cloc">Burj Khalifa District</div><div class="cspecs"><span>2 Bed</span><span>2 Bath</span><span>1,112 sqft</span></div><div class="cagent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1A3A2A,#0D1B2A)">🌊<div class="cbadge bg">Motivated</div></div><div class="cbody"><div class="cprice">AED 4,750,000</div><div class="csub">AED 2,280/sqft · 40/60 post-handover</div><div class="ctitle">3BR+M Villa · Palm Jumeirah</div><div class="cloc">Palm Jumeirah, Frond G</div><div class="cspecs"><span>3 Bed</span><span>4 Bath</span><span>2,082 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#4CAF50">SK</div><div class="aname">Sara K.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#2A1A3A,#0D1B2A)">🏗️<div class="cbadge bp">Off-Plan</div></div><div class="cbody"><div class="cprice">AED 1,380,000</div><div class="csub">AED 1,640/sqft · 60% paid</div><div class="ctitle">1BR · Business Bay</div><div class="cloc">Business Bay, Canal View</div><div class="cspecs"><span>1 Bed</span><span>2 Bath</span><span>841 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#9B59B6">AR</div><div class="aname">Ahmed R.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1A2A3A,#0D1B2A)">🏢<div class="cbadge br">Ready</div></div><div class="cbody"><div class="cprice">AED 890,000</div><div class="csub">AED 1,420/sqft · 22% below market</div><div class="ctitle">Studio · JVC</div><div class="cloc">Jumeirah Village Circle</div><div class="cspecs"><span>Studio</span><span>1 Bath</span><span>627 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#3498DB">LM</div><div class="aname">Lena M.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#2A2A1A,#0D1B2A)">🌴<div class="cbadge bg">Motivated</div></div><div class="cbody"><div class="cprice">AED 3,200,000</div><div class="csub">AED 1,950/sqft · Vacant</div><div class="ctitle">3BR Townhouse · Arabian Ranches 2</div><div class="cloc">Arabian Ranches 2</div><div class="cspecs"><span>3 Bed</span><span>3 Bath</span><span>1,641 sqft</span></div><div class="cagent"><div class="arow"><div class="av" style="color:#E74C3C">NP</div><div class="aname">Natalia P.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+      <div class="card"><div class="cimg" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br">Ready</div></div><div class="cbody"><div class="cprice">AED 1,600,000</div><div class="csub">AED 1,720/sqft · 15% below market</div><div class="ctitle">2BR · Al Barsha</div><div class="cloc">Al Barsha 1</div><div class="cspecs"><span>2 Bed</span><span>2 Bath</span><span>930 sqft</span></div><div class="cagent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     </div>
   </div>
+
+  <!-- Map -->
   <div class="map-wrap" id="mapWrap">
     <div id="map"></div>
     <div class="style-label" id="styleLabel">🌙 Night</div>
-    <div class="threed-label" id="threedLabel">3D — tilt with 2 fingers</div>
+    <div class="threed-label" id="threedLabel">⬛ 3D — tilt with 2 fingers</div>
     <div class="ctrl-tr">
       <div class="cg">
-        <button class="cb" onclick="document.getElementById('lp').classList.toggle('open')" title="Layers">
+        <button class="cb" id="layerBtn" onclick="document.getElementById('mapLpanel').classList.toggle('open')" title="Layers">
           <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l9 4.5L12 11 3 6.5zm0 6.5L3 13l9 4.5L21 13zm0 6L3 19l9 4.5L21 19"/></svg>
         </button>
         <button class="cb" id="styleBtn" title="Toggle day/night">
@@ -163,55 +618,62 @@ header { height: 54px; background: var(--navy); border-bottom: 1px solid var(--b
         </button>
       </div>
     </div>
-    <div class="lpanel" id="lp">
+    <div class="map-lpanel" id="mapLpanel">
       <div class="lhead">Map Layers</div>
-      <div class="li"><div class="ll"><div class="ld" style="background:#C0392B"></div>Distress Deals</div><div class="tog" id="tog-distress"></div></div>
-      <div class="li"><div class="ll"><div class="ld" style="background:#C8973A"></div>Motivated Sellers</div><div class="tog" id="tog-motivated"></div></div>
-      <div class="li"><div class="ll"><div class="ld" style="background:#6C3483"></div>Off-Plan Resale</div><div class="tog" id="tog-offplan"></div></div>
-      <div class="li"><div class="ll"><div class="ld" style="background:#E53935"></div>Metro Lines</div><div class="tog" id="tog-metro"></div></div>
-      <div class="li"><div class="ll"><div class="ld" style="background:#27AE60"></div>Schools & Clinics</div><div class="tog off" id="tog-schools"></div></div>
+      <div class="mli"><div class="mll"><div class="mld" style="background:#C0392B"></div>Distress Deals</div><div class="tog" id="tog-distress"></div></div>
+      <div class="mli"><div class="mll"><div class="mld" style="background:#C8973A"></div>Motivated Sellers</div><div class="tog" id="tog-motivated"></div></div>
+      <div class="mli"><div class="mll"><div class="mld" style="background:#6C3483"></div>Off-Plan Resale</div><div class="tog" id="tog-offplan"></div></div>
+      <div class="mli"><div class="mll"><div class="mld" style="background:#E53935"></div>Metro Lines</div><div class="tog" id="tog-metro"></div></div>
+      <div class="mli"><div class="mll"><div class="mld" style="background:#27AE60"></div>Schools & Clinics</div><div class="tog off" id="tog-schools"></div></div>
     </div>
     <div class="ctrl-br"><div class="cg"><button class="cb" id="zin">+</button><button class="cb" id="zout">−</button></div></div>
     <div class="mlogo"><div class="mlm">F</div><div class="mlt">Fursah</div></div>
   </div>
 </div>
 
+<!-- Grid view -->
 <div class="grid-view" id="gridView">
   <div class="grid-header"><div><div class="grid-title">All Listings</div><div class="grid-count">247 properties found</div></div></div>
   <div class="grid-cards">
-    <div class="grid-card ft"><div class="gc-img" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br" style="top:8px;left:8px">Distress</div></div><div class="gc-body"><div class="gc-price">AED 2,100,000</div><div class="gc-sub">18% below market</div><div class="gc-title">2BR · Downtown Dubai</div><div class="gc-loc">Burj Khalifa District</div><div class="gc-specs"><span>2 Bed</span><span>2 Bath</span><span>1,112 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+    <div class="grid-card ft"><div class="gc-img" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br" style="top:8px;left:8px">Ready</div></div><div class="gc-body"><div class="gc-price">AED 2,100,000</div><div class="gc-sub">18% below market</div><div class="gc-title">2BR · Downtown Dubai</div><div class="gc-loc">Burj Khalifa District</div><div class="gc-specs"><span>2 Bed</span><span>2 Bath</span><span>1,112 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1A3A2A,#0D1B2A)">🌊<div class="cbadge bg" style="top:8px;left:8px">Motivated</div></div><div class="gc-body"><div class="gc-price">AED 4,750,000</div><div class="gc-sub">40/60 post-handover</div><div class="gc-title">3BR Villa · Palm Jumeirah</div><div class="gc-loc">Frond G</div><div class="gc-specs"><span>3 Bed</span><span>4 Bath</span><span>2,082 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#4CAF50">SK</div><div class="aname">Sara K.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#2A1A3A,#0D1B2A)">🏗️<div class="cbadge bp" style="top:8px;left:8px">Off-Plan</div></div><div class="gc-body"><div class="gc-price">AED 1,380,000</div><div class="gc-sub">60% paid</div><div class="gc-title">1BR · Business Bay</div><div class="gc-loc">Canal View</div><div class="gc-specs"><span>1 Bed</span><span>2 Bath</span><span>841 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#9B59B6">AR</div><div class="aname">Ahmed R.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-    <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1A2A3A,#0D1B2A)">🏢<div class="cbadge br" style="top:8px;left:8px">Distress</div></div><div class="gc-body"><div class="gc-price">AED 890,000</div><div class="gc-sub">22% below market</div><div class="gc-title">Studio · JVC</div><div class="gc-loc">Jumeirah Village Circle</div><div class="gc-specs"><span>Studio</span><span>1 Bath</span><span>627 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#3498DB">LM</div><div class="aname">Lena M.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+    <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1A2A3A,#0D1B2A)">🏢<div class="cbadge br" style="top:8px;left:8px">Ready</div></div><div class="gc-body"><div class="gc-price">AED 890,000</div><div class="gc-sub">22% below market</div><div class="gc-title">Studio · JVC</div><div class="gc-loc">Jumeirah Village Circle</div><div class="gc-specs"><span>Studio</span><span>1 Bath</span><span>627 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#3498DB">LM</div><div class="aname">Lena M.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#2A2A1A,#0D1B2A)">🌴<div class="cbadge bg" style="top:8px;left:8px">Motivated</div></div><div class="gc-body"><div class="gc-price">AED 3,200,000</div><div class="gc-sub">Vacant · Ready</div><div class="gc-title">3BR Townhouse · Arabian Ranches</div><div class="gc-loc">Arabian Ranches 2</div><div class="gc-specs"><span>3 Bed</span><span>3 Bath</span><span>1,641 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#E74C3C">NP</div><div class="aname">Natalia P.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1A3A2A,#0D1B2A)">🌴<div class="cbadge bg" style="top:8px;left:8px">Motivated</div></div><div class="gc-body"><div class="gc-price">AED 5,500,000</div><div class="gc-sub">Sea view · Vacant</div><div class="gc-title">4BR Villa · Dubai Hills</div><div class="gc-loc">Dubai Hills Estate</div><div class="gc-specs"><span>4 Bed</span><span>5 Bath</span><span>2,619 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#4CAF50">SK</div><div class="aname">Sara K.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
     <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#2A1A3A,#0D1B2A)">🏗️<div class="cbadge bp" style="top:8px;left:8px">Off-Plan</div></div><div class="gc-body"><div class="gc-price">AED 2,800,000</div><div class="gc-sub">45% paid</div><div class="gc-title">2BR · Creek Harbour</div><div class="gc-loc">Dubai Creek Harbour</div><div class="gc-specs"><span>2 Bed</span><span>3 Bath</span><span>1,414 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av" style="color:#9B59B6">AR</div><div class="aname">Ahmed R.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
-    <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br" style="top:8px;left:8px">Distress</div></div><div class="gc-body"><div class="gc-price">AED 1,600,000</div><div class="gc-sub">15% below market</div><div class="gc-title">2BR · Al Barsha</div><div class="gc-loc">Al Barsha 1</div><div class="gc-specs"><span>2 Bed</span><span>2 Bath</span><span>930 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
+    <div class="grid-card"><div class="gc-img" style="background:linear-gradient(135deg,#1C3A5E,#0D1B2A)">🏙️<div class="cbadge br" style="top:8px;left:8px">Ready</div></div><div class="gc-body"><div class="gc-price">AED 1,600,000</div><div class="gc-sub">15% below market</div><div class="gc-title">2BR · Al Barsha</div><div class="gc-loc">Al Barsha 1</div><div class="gc-specs"><span>2 Bed</span><span>2 Bath</span><span>930 sqft</span></div><div class="gc-agent"><div class="arow"><div class="av">MH</div><div class="aname">Mohamad H.</div></div><div class="vbadge">✓ Verified</div></div></div></div>
   </div>
 </div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <script>
-mapboxgl.accessToken = 'pk.eyJ1IjoibW90ZXBvZmZpY2lhbCIsImEiOiJjbW9zYXduY3gxemRvMnNzNDVweTQxMHFyIn0.aD9pLPu2iKfESLjY19vd8Q';
-const map = new mapboxgl.Map({ container:'map', style:'mapbox://styles/mapbox/navigation-night-v1', center:[55.2708,25.2048], zoom:11, pitch:0, bearing:0 });
-map.dragRotate.enable(); map.touchPitch.enable(); map.touchZoomRotate.enable(); map.touchZoomRotate.enableRotation();
-map.on('pitch',()=>{ document.getElementById('threedLabel').classList.toggle('visible', map.getPitch()>5); });
-const metroSegments = [
-  { id:'red-main', color:'#E53935', future:false, width:4, coords:[[55.391103,25.229627],[55.365654,25.241078],[55.352221,25.248376],[55.339948,25.249424],[55.330292,25.255013],[55.32394,25.263241],[55.304412,25.254785],[55.298157,25.244495],[55.292054,25.233586],[55.28511,25.224779],[55.27988,25.217326],[55.275589,25.211134],[55.269395,25.201414],[55.260278,25.19125],[55.228088,25.156027],[55.20741,25.12645],[55.200399,25.121315],[55.190989,25.114869],[55.173608,25.102045],[55.157996,25.088857],[55.147541,25.080004],[55.139046,25.071279],[55.126951,25.057892],[55.117372,25.046976],[55.10115,25.026018],[55.0957,25.001168],[55.091108,24.977595]] },
-  { id:'red-ext1', color:'#E53935', future:false, width:4, coords:[[55.391103,25.229627],[55.41003,25.214668],[55.409781,25.188386],[55.410927,25.176249]] },
-  { id:'red-ext2', color:'#E53935', future:false, width:4, coords:[[55.117372,25.046976],[55.145241,25.035223],[55.15215,25.030518],[55.163222,25.017763],[55.155661,25.005414],[55.145799,24.963618]] },
-  { id:'red-2020', color:'#F5A623', future:false, width:3, coords:[[55.091108,24.977595],[55.081696,24.962494],[55.074948,24.953496],[55.043007,24.940439],[55.021492,24.932803],[55.003747,24.926849],[54.988147,24.921419],[54.949735,24.906033],[54.944328,24.92526],[54.949881,24.942159],[54.965224,24.94786],[54.976167,24.951479],[54.988388,24.965611],[55.005469,24.97273],[55.021166,24.97296],[55.030974,24.960759],[55.035646,24.950007]] },
-  { id:'green-main', color:'#00A651', future:false, width:4, coords:[[55.400924,25.254751],[55.387295,25.26265],[55.369338,25.273225],[55.36141,25.277835],[55.352798,25.277556],[55.346281,25.275176],[55.332689,25.27078],[55.32093,25.270213],[55.307652,25.26922],[55.301719,25.276118],[55.293036,25.268497],[55.289127,25.265351],[55.29753,25.25822],[55.314585,25.266307],[55.315953,25.243613],[55.322766,25.230909],[55.333867,25.22496],[55.33889,25.219107]] },
-  { id:'green-ext', color:'#00A651', future:false, width:3, coords:[[55.33889,25.219107],[55.353228,25.208053],[55.36099,25.205264],[55.363125,25.201939],[55.359789,25.192605],[55.36083,25.180734],[55.385427,25.170188],[55.396593,25.169554],[55.408215,25.166193],[55.400909,25.140351],[55.389065,25.122725],[55.397584,25.109688],[55.405351,25.104753]] },
-  { id:'blue', color:'#0072CE', future:true, width:2, coords:[[55.420577,25.261038],[55.432593,25.273855],[55.418882,25.245635],[55.394375,25.219107],[55.372174,25.100267],[55.373444,25.125136],[55.386232,25.14596],[55.395375,25.169577],[55.397646,25.193078],[55.384532,25.074858],[55.389249,25.08443],[55.348141,25.086198],[55.338103,25.08026],[55.32263,25.071204],[55.303888,25.060208],[55.275266,25.044389],[55.257661,25.03471],[55.241392,25.025845],[55.218976,25.013641],[55.191168,25.001009],[55.184845,24.980888],[55.194158,24.972874],[55.211444,24.970357],[55.231254,24.938286],[55.214878,24.904884],[55.185287,24.868973],[55.158999,24.845462],[55.137328,24.839205]] },
-  { id:'yellow', color:'#FDD835', future:true, width:2, coords:[[55.283193,25.254875],[55.280358,25.247582],[55.281821,25.241303],[55.278841,25.235011],[55.272804,25.226286],[55.265975,25.216711],[55.263161,25.212753],[55.259292,25.207395],[55.254212,25.19409],[55.259877,25.19009],[55.272051,25.188154],[55.296959,25.171216],[55.296756,25.16299],[55.287629,25.154981],[55.28769,25.016116],[55.281253,25.009338],[55.277285,25.003457],[55.248183,24.97634],[55.226468,24.98976],[55.204152,24.996528],[55.176783,25.097897],[55.179449,25.088759],[55.192383,25.072703],[55.207838,25.056643],[55.219132,25.042373],[55.229947,25.025145],[55.269005,24.984385]] },
-  { id:'pink', color:'#F48FB1', future:true, width:2, coords:[[55.188334,25.134823],[55.189407,25.13153],[55.203448,25.121173],[55.222307,25.108885],[55.239869,25.097976],[55.249289,25.07322],[55.249179,25.061633],[55.249411,25.050481],[55.258622,25.035467],[55.288435,25.01619],[55.295323,25.007955]] },
-  { id:'cyan', color:'#87CEAC', future:true, width:2, coords:[[55.351244,25.227847],[55.329098,25.206136],[55.312053,25.187254],[55.30393,25.172215],[55.296522,25.16214],[55.285575,25.15343],[55.281885,25.142368],[55.270447,25.130104],[55.262233,25.120426],[55.250442,25.106796],[55.24291,25.097644],[55.235293,25.088861],[55.227675,25.080038],[55.222868,25.074382],[55.214564,25.064625],[55.200379,25.048535],[55.163696,25.020884],[55.154798,25.010429],[55.148107,24.997899],[55.142206,24.971243],[55.140443,24.941366],[55.080059,24.903347],[55.077446,24.894861],[55.08896,24.8842],[55.096685,24.876881],[55.106126,24.86816],[55.122631,24.85274]] }
+// ─────────────────────────────────────
+// MAP
+// ─────────────────────────────────────
+mapboxgl.accessToken='pk.eyJ1IjoibW90ZXBvZmZpY2lhbCIsImEiOiJjbW9zYXduY3gxemRvMnNzNDVweTQxMHFyIn0.aD9pLPu2iKfESLjY19vd8Q';
+const map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/navigation-night-v1',center:[55.2708,25.2048],zoom:11,pitch:0,bearing:0,antialias:true});
+map.dragRotate.enable();map.touchPitch.enable();map.touchZoomRotate.enable();map.touchZoomRotate.enableRotation();
+map.on('pitch',()=>document.getElementById('threedLabel').classList.toggle('visible',map.getPitch()>5));
+
+// Metro — exact from working build
+const metroSegments=[
+  {id:'red-main',color:'#E53935',future:false,width:4,coords:[[55.391103,25.229627],[55.365654,25.241078],[55.352221,25.248376],[55.339948,25.249424],[55.330292,25.255013],[55.32394,25.263241],[55.304412,25.254785],[55.298157,25.244495],[55.292054,25.233586],[55.28511,25.224779],[55.27988,25.217326],[55.275589,25.211134],[55.269395,25.201414],[55.260278,25.19125],[55.228088,25.156027],[55.20741,25.12645],[55.200399,25.121315],[55.190989,25.114869],[55.173608,25.102045],[55.157996,25.088857],[55.147541,25.080004],[55.139046,25.071279],[55.126951,25.057892],[55.117372,25.046976],[55.10115,25.026018],[55.0957,25.001168],[55.091108,24.977595]]},
+  {id:'red-ext1',color:'#E53935',future:false,width:4,coords:[[55.391103,25.229627],[55.41003,25.214668],[55.409781,25.188386],[55.410927,25.176249]]},
+  {id:'red-ext2',color:'#E53935',future:false,width:4,coords:[[55.117372,25.046976],[55.145241,25.035223],[55.15215,25.030518],[55.163222,25.017763],[55.155661,25.005414],[55.145799,24.963618]]},
+  {id:'red-2020',color:'#F5A623',future:false,width:3,coords:[[55.091108,24.977595],[55.081696,24.962494],[55.074948,24.953496],[55.043007,24.940439],[55.021492,24.932803],[55.003747,24.926849],[54.988147,24.921419],[54.949735,24.906033],[54.944328,24.92526],[54.949881,24.942159],[54.965224,24.94786],[54.976167,24.951479],[54.988388,24.965611],[55.005469,24.97273],[55.021166,24.97296],[55.030974,24.960759],[55.035646,24.950007]]},
+  {id:'green-main',color:'#00A651',future:false,width:4,coords:[[55.400924,25.254751],[55.387295,25.26265],[55.369338,25.273225],[55.36141,25.277835],[55.352798,25.277556],[55.346281,25.275176],[55.332689,25.27078],[55.32093,25.270213],[55.307652,25.26922],[55.301719,25.276118],[55.293036,25.268497],[55.289127,25.265351],[55.29753,25.25822],[55.314585,25.266307],[55.315953,25.243613],[55.322766,25.230909],[55.333867,25.22496],[55.33889,25.219107]]},
+  {id:'green-ext',color:'#00A651',future:false,width:3,coords:[[55.33889,25.219107],[55.353228,25.208053],[55.36099,25.205264],[55.363125,25.201939],[55.359789,25.192605],[55.36083,25.180734],[55.385427,25.170188],[55.396593,25.169554],[55.408215,25.166193],[55.400909,25.140351],[55.389065,25.122725],[55.397584,25.109688],[55.405351,25.104753]]},
+  {id:'blue',color:'#0072CE',future:true,width:2,coords:[[55.420577,25.261038],[55.432593,25.273855],[55.418882,25.245635],[55.394375,25.219107],[55.372174,25.100267],[55.373444,25.125136],[55.386232,25.14596],[55.395375,25.169577],[55.397646,25.193078],[55.384532,25.074858],[55.389249,25.08443],[55.348141,25.086198],[55.338103,25.08026],[55.32263,25.071204],[55.303888,25.060208],[55.275266,25.044389],[55.257661,25.03471],[55.241392,25.025845],[55.218976,25.013641],[55.191168,25.001009],[55.184845,24.980888],[55.194158,24.972874],[55.211444,24.970357],[55.231254,24.938286],[55.214878,24.904884],[55.185287,24.868973],[55.158999,24.845462],[55.137328,24.839205]]},
+  {id:'yellow',color:'#FDD835',future:true,width:2,coords:[[55.283193,25.254875],[55.280358,25.247582],[55.281821,25.241303],[55.278841,25.235011],[55.272804,25.226286],[55.265975,25.216711],[55.263161,25.212753],[55.259292,25.207395],[55.254212,25.19409],[55.259877,25.19009],[55.272051,25.188154],[55.296959,25.171216],[55.296756,25.16299],[55.287629,25.154981],[55.28769,25.016116],[55.281253,25.009338],[55.277285,25.003457],[55.248183,24.97634],[55.226468,24.98976],[55.204152,24.996528],[55.176783,25.097897],[55.179449,25.088759],[55.192383,25.072703],[55.207838,25.056643],[55.219132,25.042373],[55.229947,25.025145],[55.269005,24.984385]]},
+  {id:'pink',color:'#F48FB1',future:true,width:2,coords:[[55.188334,25.134823],[55.189407,25.13153],[55.203448,25.121173],[55.222307,25.108885],[55.239869,25.097976],[55.249289,25.07322],[55.249179,25.061633],[55.249411,25.050481],[55.258622,25.035467],[55.288435,25.01619],[55.295323,25.007955]]},
+  {id:'cyan',color:'#87CEAC',future:true,width:2,coords:[[55.351244,25.227847],[55.329098,25.206136],[55.312053,25.187254],[55.30393,25.172215],[55.296522,25.16214],[55.285575,25.15343],[55.281885,25.142368],[55.270447,25.130104],[55.262233,25.120426],[55.250442,25.106796],[55.24291,25.097644],[55.235293,25.088861],[55.227675,25.080038],[55.222868,25.074382],[55.214564,25.064625],[55.200379,25.048535],[55.163696,25.020884],[55.154798,25.010429],[55.148107,24.997899],[55.142206,24.971243],[55.140443,24.941366],[55.080059,24.903347],[55.077446,24.894861],[55.08896,24.8842],[55.096685,24.876881],[55.106126,24.86816],[55.122631,24.85274]]}
 ];
 const listings=[{c:[55.2796,25.1972],col:'#C0392B',lbl:'AED 2.1M',type:'distress'},{c:[55.1348,25.1124],col:'#C8973A',lbl:'AED 4.75M',type:'motivated'},{c:[55.2651,25.1865],col:'#6C3483',lbl:'AED 1.38M',type:'offplan'},{c:[55.2099,25.0657],col:'#C0392B',lbl:'AED 890K',type:'distress'},{c:[55.2744,25.2100],col:'#C8973A',lbl:'AED 3.2M',type:'motivated'},{c:[55.3230,25.2285],col:'#C0392B',lbl:'AED 1.6M',type:'distress'},{c:[55.1760,25.0950],col:'#6C3483',lbl:'AED 2.1M',type:'offplan'},{c:[55.2404,25.1921],col:'#C8973A',lbl:'AED 5.5M',type:'motivated'},{c:[55.3100,25.2600],col:'#C0392B',lbl:'AED 780K',type:'distress'},{c:[55.1900,25.1500],col:'#6C3483',lbl:'AED 3.8M',type:'offplan'}];
-const schools=[{c:[55.2100,25.1200],n:'GEMS Wellington',t:'school'},{c:[55.2650,25.1950],n:"Dubai Int'l Academy",t:'school'},{c:[55.1800,25.0980],n:'JESS',t:'school'},{c:[55.3100,25.2300],n:'Al Rashid Clinic',t:'clinic'},{c:[55.2750,25.2150],n:'Mediclinic City',t:'clinic'},{c:[55.1600,25.1000],n:'GEMS World Academy',t:'school'},{c:[55.3500,25.2400],n:'Medcare Hospital',t:'clinic'}];
+const schools=[{c:[55.2100,25.1200],n:'GEMS Wellington',t:'school'},{c:[55.2650,25.1950],n:"Dubai Int'l Academy",t:'school'},{c:[55.3100,25.2300],n:'Al Rashid Clinic',t:'clinic'},{c:[55.2750,25.2150],n:'Mediclinic City',t:'clinic'},{c:[55.1600,25.1000],n:'GEMS World Academy',t:'school'}];
 const markerGroups={distress:[],motivated:[],offplan:[],metro:[],schools:[]};
 let metroAdded=false,metroVisible=true;
+
 function addMetro(){
   if(metroAdded)return;
   metroSegments.forEach(seg=>{
@@ -246,29 +708,39 @@ function addMarkers(){
     markerGroups.schools.push({marker,el});
   });
 }
+function add3D(){
+  if(map.getLayer('3d-buildings'))return;
+  const layers=map.getStyle().layers;
+  let labelId;for(let i=0;i<layers.length;i++){if(layers[i].type==='symbol'){labelId=layers[i].id;break;}}
+  if(!map.getSource('composite'))return;
+  map.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',filter:['==','extrude','true'],type:'fill-extrusion',minzoom:13,paint:{'fill-extrusion-color':['interpolate',['linear'],['get','height'],0,'#0D1B2A',30,'#152233',80,'#1C3A5E',150,'#1A5276',300,'#C8973A'],'fill-extrusion-height':['interpolate',['linear'],['zoom'],13,0,14,['get','height']],'fill-extrusion-base':['interpolate',['linear'],['zoom'],13,0,14,['get','min_height']],'fill-extrusion-opacity':0.85}},labelId);
+}
+map.on('load',()=>{addMarkers();addMetro();add3D();});
+map.on('style.load',()=>{metroAdded=false;addMarkers();addMetro();add3D();if(!metroVisible)setMetroVis(false);if(!document.getElementById('tog-schools').classList.contains('off'))markerGroups.schools.forEach(({el})=>el.style.display='flex');});
+
 function showGroup(g){markerGroups[g].forEach(m=>{try{m.addTo(map)}catch(e){}});}
 function hideGroup(g){markerGroups[g].forEach(m=>{try{m.remove()}catch(e){}});}
-map.on('load',()=>{
-  map.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',filter:['==','extrude','true'],type:'fill-extrusion',minzoom:14,paint:{'fill-extrusion-color':'#1a1a2e','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.8}});
-  addMarkers();addMetro();
-});
-map.on('style.load',()=>{
-  metroAdded=false;addMarkers();addMetro();setMetroVis(metroVisible);
-  if(!document.getElementById('tog-schools').classList.contains('off'))markerGroups.schools.forEach(({el})=>el.style.display='flex');
-});
 function setupTog(id,onFn,offFn,on){const t=document.getElementById(id);if(!on)t.classList.add('off');t.onclick=()=>{const off=t.classList.toggle('off');off?offFn():onFn();};}
 setupTog('tog-distress',()=>showGroup('distress'),()=>hideGroup('distress'),true);
 setupTog('tog-motivated',()=>showGroup('motivated'),()=>hideGroup('motivated'),true);
 setupTog('tog-offplan',()=>showGroup('offplan'),()=>hideGroup('offplan'),true);
 setupTog('tog-metro',()=>setMetroVis(true),()=>setMetroVis(false),true);
 setupTog('tog-schools',()=>markerGroups.schools.forEach(({el})=>el.style.display='flex'),()=>markerGroups.schools.forEach(({el})=>el.style.display='none'),false);
+
 let nightMode=true;
 document.getElementById('styleBtn').onclick=()=>{nightMode=!nightMode;map.setStyle(nightMode?'mapbox://styles/mapbox/navigation-night-v1':'mapbox://styles/mapbox/navigation-day-v1');document.getElementById('styleLabel').textContent=nightMode?'🌙 Night':'☀️ Day';};
+document.getElementById('zin').onclick=()=>map.zoomIn();
+document.getElementById('zout').onclick=()=>map.zoomOut();
+
+// ─────────────────────────────────────
+// VIEW CYCLE
+// ─────────────────────────────────────
 let viewMode=0;
 const vIcons=['<path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/>','<rect x="1" y="1" width="14" height="14" rx="1"/>','<path d="M1 1h4v4H1zm5 0h4v4H6zm5 0h4v4h-4zM1 6h4v4H1zm5 0h4v4H6zm5 0h4v4h-4zM1 11h4v4H1zm5 0h4v4H6zm5 0h4v4h-4z"/>'];
 function cycleView(){
   viewMode=(viewMode+1)%3;
-  const lp=document.getElementById('leftPanel');const gv=document.getElementById('gridView');
+  const lp=document.getElementById('leftPanel');
+  const gv=document.getElementById('gridView');
   lp.classList.remove('hidden');gv.classList.remove('active');
   if(viewMode===1){lp.classList.add('hidden');setTimeout(()=>map.resize(),320);}
   else if(viewMode===2){lp.classList.add('hidden');gv.classList.add('active');}
@@ -276,9 +748,122 @@ function cycleView(){
   document.getElementById('viewBtn').classList.toggle('active',viewMode!==0);
   setTimeout(()=>map.resize(),370);
 }
-document.getElementById('zin').onclick=()=>map.zoomIn();
-document.getElementById('zout').onclick=()=>map.zoomOut();
-document.addEventListener('click',e=>{const lp=document.getElementById('lp');if(!lp.contains(e.target)&&!e.target.closest('[onclick*="lp"]'))lp.classList.remove('open');});
+
+// ─────────────────────────────────────
+// FILTER PANEL
+// ─────────────────────────────────────
+let filterOpen=false;
+function toggleFilters(){
+  filterOpen=!filterOpen;
+  document.getElementById('filterPanel').classList.toggle('open',filterOpen);
+  document.getElementById('backdrop').classList.toggle('show',filterOpen);
+  document.getElementById('filterBtn').classList.toggle('active',filterOpen);
+  // Close map layers panel if open
+  document.getElementById('mapLpanel').classList.remove('open');
+}
+function closeAllOverlays(){
+  filterOpen=false;
+  document.getElementById('filterPanel').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('show');
+  document.getElementById('filterBtn').classList.remove('active');
+  document.getElementById('searchDropdown').classList.remove('open');
+  document.getElementById('mapLpanel').classList.remove('open');
+}
+
+// ─────────────────────────────────────
+// SEARCH DROPDOWN
+// ─────────────────────────────────────
+const searchInput=document.getElementById('searchInput');
+const searchDropdown=document.getElementById('searchDropdown');
+searchInput.addEventListener('focus',()=>{ searchDropdown.classList.add('open'); document.getElementById('backdrop').classList.add('show'); });
+searchInput.addEventListener('input',()=>{ if(searchInput.value.length>0)searchDropdown.classList.add('open'); });
+function selectSearch(val){ searchInput.value=val; searchDropdown.classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+// Prevent backdrop closing when clicking inside search
+document.querySelector('.search-wrap').addEventListener('click',e=>e.stopPropagation());
+
+// ─────────────────────────────────────
+// CHIP TOGGLES
+// ─────────────────────────────────────
+function toggleChip(chip,groupId){
+  chip.classList.toggle('selected');
+  updateFilterCount();
+}
+function toggleChipSingle(chip,groupId){
+  // Only one can be selected at a time
+  const group=document.getElementById(groupId);
+  group.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  chip.classList.add('selected');
+  updateFilterCount();
+}
+function resetSection(groupId){
+  const group=document.getElementById(groupId);
+  // Deal stage defaults all ON, others default all OFF
+  if(groupId==='dealStage'){group.querySelectorAll('.chip').forEach(c=>c.classList.add('selected'));}
+  else{group.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));}
+  updateFilterCount();
+}
+function resetPrice(){ document.getElementById('priceMin').value=''; document.getElementById('priceMax').value=''; updateFilterCount(); }
+function resetPsf(){ document.getElementById('psfMin').value=''; document.getElementById('psfMax').value=''; updateFilterCount(); }
+
+// ─────────────────────────────────────
+// FILTER COUNT BADGE
+// ─────────────────────────────────────
+function updateFilterCount(){
+  let count=0;
+  // Location chips selected
+  count+=document.querySelectorAll('#location .chip.selected').length;
+  // Below market
+  count+=document.querySelectorAll('#belowMarket .chip.selected').length;
+  // Bedrooms
+  count+=document.querySelectorAll('#bedrooms .chip.selected').length;
+  // Unit type
+  count+=document.querySelectorAll('#unitType .chip.selected').length;
+  // Payment plan
+  count+=document.querySelectorAll('#paymentPlan .chip.selected').length;
+  // Price
+  if(document.getElementById('priceMin').value||document.getElementById('priceMax').value)count++;
+  // PSF
+  if(document.getElementById('psfMin').value||document.getElementById('psfMax').value)count++;
+  // Deal stage — only count if not all three selected (i.e. filtered)
+  const dsSelected=document.querySelectorAll('#dealStage .chip.selected').length;
+  if(dsSelected<3)count++;
+
+  const badge=document.getElementById('filterCount');
+  const clearBtn=document.getElementById('clearBtn');
+  badge.textContent=count;
+  badge.classList.toggle('show',count>0);
+  clearBtn.style.display=count>0?'flex':'none';
+}
+
+function clearAllFilters(){
+  resetSection('dealStage');
+  resetSection('location');
+  resetSection('belowMarket');
+  resetSection('bedrooms');
+  resetSection('unitType');
+  resetSection('paymentPlan');
+  resetPrice();resetPsf();
+  updateFilterCount();
+}
+
+function applyFilters(){
+  // In production this fires a Bubble search — for now just close the panel
+  toggleFilters();
+}
+
+function filterLocations(val){
+  const chips=document.querySelectorAll('#location .chip');
+  chips.forEach(c=>{ c.style.display=c.dataset.value.includes(val.toLowerCase())||c.textContent.toLowerCase().includes(val.toLowerCase())?'':'none'; });
+}
+
+// ─────────────────────────────────────
+// CLOSE MAP LAYERS PANEL ON OUTSIDE CLICK
+// ─────────────────────────────────────
+document.addEventListener('click',e=>{
+  const lp=document.getElementById('mapLpanel');
+  const lb=document.getElementById('layerBtn');
+  if(!lp.contains(e.target)&&!lb.contains(e.target))lp.classList.remove('open');
+});
 </script>
 </body>
 </html>
