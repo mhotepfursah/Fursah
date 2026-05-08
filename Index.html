@@ -477,6 +477,19 @@ header {
 
     </div><!-- /offplanFilters -->
 
+    <!-- Below Market % — Ready only -->
+    <div id="readyFilters">
+    <div class="fs">
+      <div class="fs-head"><div class="fs-label">Below Market %</div><div class="fs-reset" onclick="resetChips('belowMarket',false)">Reset</div></div>
+      <div class="chips" id="belowMarket">
+        <div class="chip" data-value="5" onclick="toggleChipSingle(this,'belowMarket')">5%+</div>
+        <div class="chip" data-value="10" onclick="toggleChipSingle(this,'belowMarket')">10%+</div>
+        <div class="chip" data-value="15" onclick="toggleChipSingle(this,'belowMarket')">15%+</div>
+        <div class="chip" data-value="20" onclick="toggleChipSingle(this,'belowMarket')">20%+</div>
+        <div class="chip" data-value="25" onclick="toggleChipSingle(this,'belowMarket')">25%+</div>
+      </div>
+    </div>
+    </div>
 
     <!-- Price Range -->
     <div class="fs">
@@ -573,7 +586,7 @@ header {
       </div>
     </div>
 
-        <!-- Developer -->
+    <!-- Developer -->
     <div class="fs">
       <div class="fs-head"><div class="fs-label">Developer</div><div class="fs-reset" onclick="resetChips('developer',false)">Reset</div></div>
       <div class="chips" id="developer">
@@ -1058,8 +1071,8 @@ function setPropStatus(val){
   });
   const btn=document.querySelector(`.prop-toggle-btn[data-value="${val}"]`);
   btn.classList.add(val==='ready'?'active-ready':'active-offplan','selected');
-  const offplan=document.getElementById('offplanFilters');
-  offplan.style.display=val==='offplan'?'block':'none';
+  document.getElementById('offplanFilters').style.display=val==='offplan'?'block':'none';
+  document.getElementById('readyFilters').style.display=val==='ready'?'block':'none';
   updateFilterCount();
 }
 function setPostHandover(val){
