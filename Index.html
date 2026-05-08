@@ -101,7 +101,7 @@ header {
   width:300px; flex-shrink:0;
   background:var(--light); display:flex; flex-direction:column; overflow:hidden;
   transition:width .3s ease, opacity .3s ease;
-  border-right:1px solid var(--light-3);
+  border-left:1px solid var(--light-3);
 }
 .left-panel.hidden { width:0; opacity:0; pointer-events:none; }
 .ph { padding:14px 16px 10px; border-bottom:1px solid var(--light-3); flex-shrink:0; background:var(--light); }
@@ -222,7 +222,7 @@ header {
 .tog.off::after { right:auto; left:2px; }
 
 /* ── BACKDROP ── */
-.overlay-backdrop { display:none; position:fixed; top:54px; left:0; right:0; bottom:0; background:rgba(10,4,35,0.5); z-index:140; backdrop-filter:blur(1px); }
+.overlay-backdrop { display:none; position:fixed; top:54px; left:0; right:0; bottom:0; background:transparent; z-index:140; }
 .overlay-backdrop.show { display:block; }
 
 /* ── FILTER PANEL ── */
@@ -404,31 +404,6 @@ header {
       </div>
     </div>
 
-    <!-- Location -->
-    <div class="fs">
-      <div class="fs-head"><div class="fs-label">Location</div><div class="fs-reset" onclick="resetChips('location',false)">Reset</div></div>
-      <div class="loc-search">
-        <svg width="12" height="12" fill="var(--text-muted)" viewBox="0 0 24 24"><path d="M10 5a5 5 0 1 0 0 10A5 5 0 0 0 10 5m-7 5a7 7 0 1 1 14 0A7 7 0 0 1 3 10"/></svg>
-        <input type="text" placeholder="Search area…" oninput="filterLocationChips(this.value)">
-      </div>
-      <div class="chips" id="location">
-        <div class="chip" data-value="downtown" onclick="toggleChip(this)">Downtown Dubai</div>
-        <div class="chip" data-value="marina" onclick="toggleChip(this)">Dubai Marina</div>
-        <div class="chip" data-value="businessbay" onclick="toggleChip(this)">Business Bay</div>
-        <div class="chip" data-value="jvc" onclick="toggleChip(this)">JVC</div>
-        <div class="chip" data-value="palm" onclick="toggleChip(this)">Palm Jumeirah</div>
-        <div class="chip" data-value="jbr" onclick="toggleChip(this)">JBR</div>
-        <div class="chip" data-value="difc" onclick="toggleChip(this)">DIFC</div>
-        <div class="chip" data-value="creek" onclick="toggleChip(this)">Creek Harbour</div>
-        <div class="chip" data-value="hills" onclick="toggleChip(this)">Dubai Hills</div>
-        <div class="chip" data-value="arabian" onclick="toggleChip(this)">Arabian Ranches</div>
-        <div class="chip" data-value="meydan" onclick="toggleChip(this)">Meydan</div>
-        <div class="chip" data-value="bluewaters" onclick="toggleChip(this)">Bluewaters Island</div>
-        <div class="chip" data-value="sobha" onclick="toggleChip(this)">Sobha Hartland</div>
-        <div class="chip" data-value="damac" onclick="toggleChip(this)">DAMAC Hills</div>
-      </div>
-    </div>
-
     <!-- Below Market % -->
     <div class="fs">
       <div class="fs-head"><div class="fs-label">Below Market %</div><div class="fs-reset" onclick="resetChips('belowMarket',false)">Reset</div></div>
@@ -477,16 +452,45 @@ header {
       </div>
     </div>
 
-    <!-- Payment Plan -->
-    <div class="fs">
-      <div class="fs-head"><div class="fs-label">Payment Plan</div><div class="fs-reset" onclick="resetChips('payPlan',false)">Reset</div></div>
-      <div class="chips" id="payPlan">
-        <div class="chip" data-value="cash" onclick="toggleChip(this)">Cash only</div>
-        <div class="chip" data-value="posthandover" onclick="toggleChip(this)">Post-handover</div>
-        <div class="chip" data-value="mortgage" onclick="toggleChip(this)">Mortgage-friendly</div>
+    <!-- Floor Level -->
+    <div class="fs" id="floorSection">
+      <div class="fs-head"><div class="fs-label">Floor Level</div><div class="fs-reset" onclick="resetChips('floorLevel',false)">Reset</div></div>
+      <div class="chips" id="floorLevel">
+        <div class="chip" data-value="low" onclick="toggleChipSingle(this,'floorLevel')">Low Floor</div>
+        <div class="chip" data-value="mid" onclick="toggleChipSingle(this,'floorLevel')">Mid Floor</div>
+        <div class="chip" data-value="high" onclick="toggleChipSingle(this,'floorLevel')">High Floor</div>
       </div>
     </div>
 
+    <!-- Row Type -->
+    <div class="fs" id="rowSection">
+      <div class="fs-head"><div class="fs-label">Row Type</div><div class="fs-reset" onclick="resetChips('rowType',false)">Reset</div></div>
+      <div class="chips" id="rowType">
+        <div class="chip" data-value="single" onclick="toggleChipSingle(this,'rowType')">Single Row</div>
+        <div class="chip" data-value="double" onclick="toggleChipSingle(this,'rowType')">Double Row</div>
+      </div>
+    </div>
+
+    <!-- Corner Unit -->
+    <div class="fs">
+      <div class="fs-head"><div class="fs-label">Corner Unit</div><div class="fs-reset" onclick="resetChips('cornerUnit',false)">Reset</div></div>
+      <div class="chips" id="cornerUnit">
+        <div class="chip" data-value="yes" onclick="toggleChipSingle(this,'cornerUnit')">Yes</div>
+        <div class="chip" data-value="no" onclick="toggleChipSingle(this,'cornerUnit')">No</div>
+        <div class="chip" data-value="any" onclick="toggleChipSingle(this,'cornerUnit')">Any</div>
+      </div>
+    </div>
+
+    <!-- Financing -->
+    <div class="fs">
+      <div class="fs-head"><div class="fs-label">Financing</div><div class="fs-reset" onclick="resetChips('financing',false)">Reset</div></div>
+      <div class="chips" id="financing">
+        <div class="chip" data-value="mortgage" onclick="toggleChipSingle(this,'financing')">Mortgage Friendly</div>
+        <div class="chip" data-value="cash" onclick="toggleChipSingle(this,'financing')">Cash Only</div>
+      </div>
+    </div>
+
+    
     <div class="fp-footer">
       <button class="fp-btn secondary" onclick="clearAllFilters()">Reset all</button>
       <button class="fp-btn primary" onclick="applyFilters()">Show results</button>
@@ -498,7 +502,7 @@ header {
 <div class="app-body">
 
   <!-- Left panel — PDF card style -->
-  <div class="left-panel" id="leftPanel">
+  <div class="left-panel hidden" id="leftPanel" style="order:2">
     <div class="ph">
       <div class="ph-top">
         <div class="ph-title">Active <em>Opportunities</em></div>
@@ -700,7 +704,7 @@ header {
   </div>
 
   <!-- Map -->
-  <div class="map-wrap" id="mapWrap">
+  <div class="map-wrap" id="mapWrap" style="order:1">
     <div id="map"></div>
     <div class="threed-label" id="threedLabel">⬛ 3D — tilt with 2 fingers</div>
     <div class="ctrl-tr">
@@ -918,7 +922,7 @@ function cycleView(){
   viewMode=(viewMode+1)%3;
   const lp=document.getElementById('leftPanel');const gv=document.getElementById('gridView');
   lp.classList.remove('hidden');gv.classList.remove('active');
-  if(viewMode===1){lp.classList.add('hidden');setTimeout(()=>map.resize(),320);}
+  if(viewMode===0){lp.classList.add('hidden');setTimeout(()=>map.resize(),320);}
   else if(viewMode===2){lp.classList.add('hidden');gv.classList.add('active');}
   document.getElementById('viewIcon').innerHTML=vIcons[viewMode];
   document.getElementById('viewBtn').classList.toggle('active',viewMode!==0);
