@@ -398,9 +398,9 @@ header {
     <!-- Property Status -->
     <div class="fs">
       <div class="fs-head"><div class="fs-label">Property Status</div><div class="fs-reset" onclick="resetChips('propStatus',false)">Reset</div></div>
-      <div class="chips" id="propStatus">
-        <div class="chip selected" data-value="ready" onclick="toggleChip(this)">Ready</div>
-        <div class="chip selected" data-value="offplan" onclick="toggleChip(this)">Off-Plan</div>
+      <div class="prop-toggle" id="propStatus">
+        <div class="prop-toggle-btn active-ready" data-value="ready" onclick="setPropStatus('ready')">Ready</div>
+        <div class="prop-toggle-btn" data-value="offplan" onclick="setPropStatus('offplan')">Off-Plan</div>
       </div>
     </div>
 
