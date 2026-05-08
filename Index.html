@@ -404,17 +404,79 @@ header {
       </div>
     </div>
 
-    <!-- Below Market % -->
-    <div class="fs">
-      <div class="fs-head"><div class="fs-label">Below Market %</div><div class="fs-reset" onclick="resetChips('belowMarket',false)">Reset</div></div>
-      <div class="chips" id="belowMarket">
-        <div class="chip" data-value="5" onclick="toggleChipSingle(this,'belowMarket')">5%+</div>
-        <div class="chip" data-value="10" onclick="toggleChipSingle(this,'belowMarket')">10%+</div>
-        <div class="chip" data-value="15" onclick="toggleChipSingle(this,'belowMarket')">15%+</div>
-        <div class="chip" data-value="20" onclick="toggleChipSingle(this,'belowMarket')">20%+</div>
-        <div class="chip" data-value="25" onclick="toggleChipSingle(this,'belowMarket')">25%+</div>
+    <!-- Off-Plan Filters (hidden by default) -->
+    <div id="offplanFilters" style="display:none">
+
+      <!-- Below OP % -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Below OP %</div><div class="fs-reset" onclick="resetChips('belowOP',false)">Reset</div></div>
+        <div class="chips" id="belowOP">
+          <div class="chip" data-value="aboveop" onclick="toggleChip(this)">Above OP</div>
+          <div class="chip" data-value="atop" onclick="toggleChip(this)">At OP</div>
+          <div class="chip" data-value="opdld" onclick="toggleChip(this)">OP + DLD</div>
+          <div class="chip" data-value="opadm" onclick="toggleChip(this)">OP + ADM</div>
+          <div class="chip" data-value="5" onclick="toggleChip(this)">5%+ Below</div>
+          <div class="chip" data-value="10" onclick="toggleChip(this)">10%+ Below</div>
+          <div class="chip" data-value="15" onclick="toggleChip(this)">15%+ Below</div>
+          <div class="chip" data-value="20" onclick="toggleChip(this)">20%+ Below</div>
+          <div class="chip" data-value="30" onclick="toggleChip(this)">30%+ Below</div>
+        </div>
       </div>
-    </div>
+
+      <!-- Total Cost to Buyer -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Total Cost to Buyer (AED)</div><div class="fs-reset" onclick="resetTotalCost()">Reset</div></div>
+        <div class="price-row">
+          <div class="price-col"><div class="price-label">Min</div><input class="price-input" id="totalCostMin" type="number" placeholder="0" oninput="updateFilterCount()"></div>
+          <div class="price-sep">—</div>
+          <div class="price-col"><div class="price-label">Max</div><input class="price-input" id="totalCostMax" type="number" placeholder="Any" oninput="updateFilterCount()"></div>
+        </div>
+      </div>
+
+      <!-- Downpayment Required -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Downpayment Required (AED)</div><div class="fs-reset" onclick="resetDownpayment()">Reset</div></div>
+        <div class="price-row">
+          <div class="price-col"><div class="price-label">Min</div><input class="price-input" id="downpaymentMin" type="number" placeholder="0" oninput="updateFilterCount()"></div>
+          <div class="price-sep">—</div>
+          <div class="price-col"><div class="price-label">Max</div><input class="price-input" id="downpaymentMax" type="number" placeholder="Any" oninput="updateFilterCount()"></div>
+        </div>
+      </div>
+
+      <!-- Handover Date -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Handover Date</div><div class="fs-reset" onclick="resetHandover()">Reset</div></div>
+        <div class="price-row">
+          <div class="price-col"><div class="price-label">From</div><input class="price-input" id="handoverFrom" type="month" oninput="updateFilterCount()"></div>
+          <div class="price-sep">—</div>
+          <div class="price-col"><div class="price-label">To</div><input class="price-input" id="handoverTo" type="month" oninput="updateFilterCount()"></div>
+        </div>
+      </div>
+
+      <!-- Original Payment Plan -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Original Payment Plan</div><div class="fs-reset" onclick="resetChips('paymentPlan',false)">Reset</div></div>
+        <div class="chips" id="paymentPlan">
+          <div class="chip" data-value="30-70" onclick="toggleChip(this)">30/70</div>
+          <div class="chip" data-value="40-60" onclick="toggleChip(this)">40/60</div>
+          <div class="chip" data-value="60-40" onclick="toggleChip(this)">60/40</div>
+          <div class="chip" data-value="65-35" onclick="toggleChip(this)">65/35</div>
+          <div class="chip" data-value="80-20" onclick="toggleChip(this)">80/20</div>
+          <div class="chip" data-value="50-50" onclick="toggleChip(this)">50/50</div>
+        </div>
+      </div>
+
+      <!-- Post Handover -->
+      <div class="fs">
+        <div class="fs-head"><div class="fs-label">Post-Handover</div></div>
+        <div class="prop-toggle" id="postHandover">
+          <div class="prop-toggle-btn" data-value="yes" onclick="setPostHandover('yes')">Yes</div>
+          <div class="prop-toggle-btn" data-value="no" onclick="setPostHandover('no')">No</div>
+        </div>
+      </div>
+
+    </div><!-- /offplanFilters -->
+
 
     <!-- Price Range -->
     <div class="fs">
