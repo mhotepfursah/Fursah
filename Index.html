@@ -1052,6 +1052,39 @@ function selectSearch(val){searchInput.value=val;searchDropdown.classList.remove
 document.querySelector('.search-wrap').addEventListener('click',e=>e.stopPropagation());
 
 // Chips
+function setPropStatus(val){
+  document.querySelectorAll('.prop-toggle-btn').forEach(b=>{
+    b.classList.remove('active-ready','active-offplan','selected');
+  });
+  const btn=document.querySelector(`.prop-toggle-btn[data-value="${val}"]`);
+  btn.classList.add(val==='ready'?'active-ready':'active-offplan','selected');
+  const offplan=document.getElementById('offplanFilters');
+  offplan.style.display=val==='offplan'?'block':'none';
+  updateFilterCount();
+}
+function setPostHandover(val){
+  document.querySelectorAll('#postHandover .prop-toggle-btn').forEach(b=>{
+    b.classList.remove('active-ready','active-offplan');
+  });
+  const btn=document.querySelector(`#postHandover .prop-toggle-btn[data-value="${val}"]`);
+  btn.classList.add('active-ready');
+  updateFilterCount();
+}
+function resetTotalCost(){
+  document.getElementById('totalCostMin').value='';
+  document.getElementById('totalCostMax').value='';
+  updateFilterCount();
+}
+function resetDownpayment(){
+  document.getElementById('downpaymentMin').value='';
+  document.getElementById('downpaymentMax').value='';
+  updateFilterCount();
+}
+function resetHandover(){
+  document.getElementById('handoverFrom').value='';
+  document.getElementById('handoverTo').value='';
+  updateFilterCount();
+}
 function updateUnitFilters(){
   const selected=document.querySelectorAll('#propType .chip.selected');
   const vals=Array.from(selected).map(c=>c.dataset.value);
