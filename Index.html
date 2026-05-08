@@ -444,11 +444,11 @@ header {
     <div class="fs">
       <div class="fs-head"><div class="fs-label">Property Type</div><div class="fs-reset" onclick="resetChips('propType',false)">Reset</div></div>
       <div class="chips" id="propType">
-        <div class="chip" data-value="apartment" onclick="toggleChip(this)">Apartment</div>
-        <div class="chip" data-value="villa" onclick="toggleChip(this)">Villa</div>
-        <div class="chip" data-value="townhouse" onclick="toggleChip(this)">Townhouse</div>
-        <div class="chip" data-value="penthouse" onclick="toggleChip(this)">Penthouse</div>
-        <div class="chip" data-value="office" onclick="toggleChip(this)">Office</div>
+        <div class="chip" data-value="apartment" onclick="toggleChip(this);updateUnitFilters()">Apartment</div>
+        <div class="chip" data-value="villa" onclick="toggleChip(this);updateUnitFilters()">Villa</div>
+        <div class="chip" data-value="townhouse" onclick="toggleChip(this);updateUnitFilters()">Townhouse</div>
+        <div class="chip" data-value="penthouse" onclick="toggleChip(this);updateUnitFilters()">Penthouse</div>
+        <div class="chip" data-value="office" onclick="toggleChip(this);updateUnitFilters()">Office</div>
       </div>
     </div>
 
@@ -990,6 +990,17 @@ function selectSearch(val){searchInput.value=val;searchDropdown.classList.remove
 document.querySelector('.search-wrap').addEventListener('click',e=>e.stopPropagation());
 
 // Chips
+function updateUnitFilters(){
+  const selected=document.querySelectorAll('#propType .chip.selected');
+  const vals=Array.from(selected).map(c=>c.dataset.value);
+  const hasFloor=vals.includes('apartment')||vals.includes('penthouse')||vals.includes('office');
+  const hasRow=vals.includes('villa')||vals.includes('townhouse');
+  const floor=document.getElementById('floorSection');
+  const row=document.getElementById('rowSection');
+  if(hasFloor&&!hasRow){row.style.display='none';floor.style.display='';}
+  else if(hasRow&&!hasFloor){floor.style.display='none';row.style.display='';}
+  else{floor.style.display='';row.style.display='';}
+}
 function toggleChip(chip){chip.classList.toggle('selected');updateFilterCount();}
 function toggleChipSingle(chip,gId){document.getElementById(gId).querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');updateFilterCount();}
 function resetChips(gId,allOn){const g=document.getElementById(gId);g.querySelectorAll('.chip').forEach(c=>{allOn?c.classList.add('selected'):c.classList.remove('selected');});updateFilterCount();}
