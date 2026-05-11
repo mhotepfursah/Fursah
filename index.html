@@ -262,19 +262,19 @@ header {
 .filter-panel.open { transform:translateX(0); }
 
 .fp-header {
+  margin:16px 12px 12px;
+  padding:16px 18px;
+  background:var(--dark);
+  border-radius:24px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:14px 16px;
-  border-bottom:1px solid var(--light-3);
   flex-shrink:0;
-  background:var(--light);
-  position:sticky;
-  top:0;
-  z-index:5;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 8px 24px rgba(10,4,35,0.18);
 }
 .fp-title {
-  font-size:15px;
+  font-size:20px;
   font-weight:700;
   color:var(--text-white);
 }
@@ -302,35 +302,35 @@ header {
 .fp-body {
   flex:1;
   overflow-y:auto;
+  overflow-x:hidden;
   min-height:0;
-
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(173,220,240,0.28) 0%,
-      rgba(173,220,240,0.12) 100%
-    );
+  padding:16px 12px 90px;
+  background:rgba(232,248,250,0.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-radius:32px 32px 0 0;
+  border:1px solid rgba(255,255,255,0.45);
+  box-shadow:0 10px 35px rgba(10,4,35,0.16);
 }
+
 .fp-body::-webkit-scrollbar { width:3px; }
 .fp-body::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.25); border-radius:2px; }
 
 .fp-footer {
-  position:absolute;
-  left:12px;
-  right:12px;
-  bottom:14px;
-  padding:0;
+  position:sticky;
+  bottom:0;
+  padding:14px 12px calc(env(safe-area-inset-bottom,0px) + 14px);
   display:flex;
-  gap:8px;
-  background:transparent;
-  border-top:none;
-  z-index:3;
+  gap:10px;
+  background:rgba(232,248,250,0.92);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-top:1px solid rgba(255,255,255,0.45);
+  margin:0 -12px -16px;
+  border-radius:24px 24px 0 0;
+  z-index:20;
 }
+
 .fp-btn { flex:1; height:38px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all .15s; }
 .fp-btn.secondary { background:var(--light-2); color:var(--text-mid); border:1px solid var(--light-3); }
 .fp-btn.secondary:hover { background:var(--light-3); }
@@ -716,10 +716,6 @@ input[type="month"].price-input {
   </div>
   <div class="fp-body">
 
-    <div class="distress-banner">
-      <div class="distress-dot"></div>
-      <div class="distress-text">All listings are verified distress deals</div>
-    </div>
 
 <!-- Property Status -->
 <div class="fs">
