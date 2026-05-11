@@ -444,7 +444,77 @@ input[type="month"].price-input {
 .switch input:checked + .slider:before {
   transform:translateX(20px);
 }
+/* Settings dropdown for language, currency, measures */
+.settings-panel {
+  position:absolute;
+  top:44px;
+  right:0;
+  width:280px;
+  background:var(--light);
+  border:1px solid var(--light-3);
+  border-radius:16px;
+  box-shadow:0 12px 35px rgba(10,4,35,0.28);
+  padding:18px;
+  z-index:999;
+  display:none;
+}
 
+.settings-panel.open {
+  display:block;
+}
+
+.settings-section {
+  margin-bottom:18px;
+}
+
+.settings-section:last-child {
+  margin-bottom:0;
+}
+
+.settings-title {
+  font-size:16px;
+  font-weight:800;
+  color:var(--text-dark);
+  margin-bottom:10px;
+}
+
+.settings-grid {
+  display:grid;
+  gap:8px;
+}
+
+.settings-grid.two {
+  grid-template-columns:1fr;
+}
+
+.settings-grid.three {
+  grid-template-columns:repeat(3,1fr);
+}
+
+.setting-pill {
+  height:34px;
+  border:none;
+  border-radius:999px;
+  background:var(--light-2);
+  color:var(--text-mid);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+
+.setting-pill:hover {
+  background:var(--light-3);
+}
+
+.setting-pill.active {
+  background:var(--dark);
+  color:var(--text-white);
+}
+
+.settings-wrap {
+  position:relative;
+}
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
@@ -490,7 +560,42 @@ input[type="month"].price-input {
   </div>
 
   <div class="hdr-right">
-    <div class="meta">AED | sqft</div>
+  <div class="settings-wrap">
+  <div class="meta" id="settingsBtn" onclick="toggleSettingsPanel()">AED | sqft</div>
+
+  <div class="settings-panel" id="settingsPanel">
+
+    <div class="settings-section">
+      <div class="settings-title">Language</div>
+      <div class="settings-grid two">
+        <button class="setting-pill active" onclick="setSettingPill(this)">🇬🇧 English</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">🇦🇪 العربية</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">🇷🇺 Русский</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Currency</div>
+      <div class="settings-grid three">
+        <button class="setting-pill active" onclick="setSettingPill(this)">AED</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">USD</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">EUR</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">GBP</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">RUB</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">INR</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Measures</div>
+      <div class="settings-grid two">
+        <button class="setting-pill active" onclick="setSettingPill(this)">sqft</button>
+        <button class="setting-pill" onclick="setSettingPill(this)">m²</button>
+      </div>
+    </div>
+
+  </div>
+</div>
     <div class="icon-btn" id="viewBtn" onclick="cycleView()" title="Change view">
       <svg id="viewIcon" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/></svg>
     </div>
@@ -1320,6 +1425,28 @@ function applyFilters(){toggleFilters();}
 document.addEventListener('click',e=>{
   const lp=document.getElementById('mapLpanel');const lb=document.getElementById('layerBtn');
   if(!lp.contains(e.target)&&!lb.contains(e.target))lp.classList.remove('open');
+});
+function toggleSettingsPanel(){
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.toggle('open');
+}
+
+function setSettingPill(btn){
+  const section = btn.closest('.settings-section');
+  section.querySelectorAll('.setting-pill').forEach(pill => {
+    pill.classList.remove('active');
+  });
+
+  btn.classList.add('active');
+}
+
+document.addEventListener('click', function(e){
+  const wrap = document.querySelector('.settings-wrap');
+  const panel = document.getElementById('settingsPanel');
+
+  if(wrap && panel && !wrap.contains(e.target)){
+    panel.classList.remove('open');
+  }
 });
 </script>
 </body>
