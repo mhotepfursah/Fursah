@@ -545,6 +545,16 @@ input[type="month"].price-input {
 .settings-wrap {
   position:relative;
 }
+
+#offplanFilters {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+#offplanFilters[style*="display:none"] {
+  display:none !important;
+}
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
@@ -1374,7 +1384,7 @@ function setPropStatus(val){
   });
   const btn=document.querySelector(`.prop-toggle-btn[data-value="${val}"]`);
   btn.classList.add(val==='ready'?'active-ready':'active-offplan','selected');
-  document.getElementById('offplanFilters').style.display=val==='offplan'?'block':'none';
+  document.getElementById('offplanFilters').style.display=val==='offplan'?'flex':'none';
   document.getElementById('readyFilters').style.display=val==='ready'?'block':'none';
   updateFilterCount();
 }
