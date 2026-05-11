@@ -305,6 +305,9 @@ header {
   overflow-y:auto;
   min-height:0;
   padding:14px 14px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
 .fp-body::-webkit-scrollbar { width:3px; }
@@ -339,6 +342,18 @@ header {
   border:1px solid rgba(10,4,35,0.06);
   border-radius:22px;
   box-shadow:0 8px 22px rgba(10,4,35,0.08);
+  flex-shrink:0;
+}
+
+  #readyFilters {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+#offplanFilters {
+  flex-direction:column;
+  gap:14px;
 }
 
 .fs:last-child {
@@ -599,15 +614,7 @@ input[type="month"].price-input {
   position:relative;
 }
 
-#offplanFilters {
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
 
-#offplanFilters[style*="display:none"] {
-  display:none !important;
-}
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
