@@ -98,13 +98,30 @@ header {
   flex-shrink:0;
 }
 .meta {
-  font-size:10px;
-  color:var(--dark); border-right:1px solid var(--border-dark); padding-right:8px; }
-.icon-btn {
-  width:30px; height:30px; background:var(--light-2);
-  border:1px solid var(--light-3); border-radius:7px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; color:var(--dark); position:relative; transition:all .15s;
+  height:36px;
+  padding:0 16px;
+  background:var(--light-2);
+  border:1px solid var(--light-3);
+  border-radius:12px;
+
+  display:flex;
+  align-items:center;
+  gap:9px;
+
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.2px;
+  color:var(--dark);
+
+  cursor:pointer;
+
+  box-shadow:0 2px 8px rgba(10,4,35,0.06);
+  transition:all .15s ease;
+}
+
+.meta:hover {
+  border-color:var(--gold);
+  background:var(--gold-dim);
 }
 .icon-btn:hover,.icon-btn.active { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
 .icon-btn svg { width:13px; height:13px; }
@@ -661,7 +678,7 @@ input[type="month"].price-input {
 
   <div class="hdr-right">
   <div class="settings-wrap">
-  <div class="meta" id="settingsBtn" onclick="toggleSettingsPanel()">AED | sqft</div>
+  <div class="meta" id="settingsBtn" onclick="toggleSettingsPanel()">🇬🇧 <span>AED</span> <span>|</span> <span>sqft</span></div>
 
   <div class="settings-panel" id="settingsPanel">
 
