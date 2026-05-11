@@ -494,7 +494,6 @@ input[type="month"].price-input {
     <div class="icon-btn" id="viewBtn" onclick="cycleView()" title="Change view">
       <svg id="viewIcon" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/></svg>
     </div>
-    <div class="icon-btn"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-4-8 4V6z"/></svg><div class="bdg">3</div></div>
   </div>
 </header>
 
@@ -744,7 +743,11 @@ input[type="month"].price-input {
 
     <!-- Developer -->
     <div class="fs">
-      <div class="fs-head"><div class="fs-label">Developer</div><div class="fs-reset" onclick="resetChips('developer',false)">Reset</div></div>
+      <div class="fs-head">
+        <div class="fs-label">Developer</div>
+        <div class="fs-reset" onclick="resetChips('developer',false)">Reset</div>
+      </div>
+
       <div class="chips" id="developer">
         <div class="chip" data-value="emaar" onclick="toggleChip(this)">Emaar</div>
         <div class="chip" data-value="damac" onclick="toggleChip(this)">DAMAC</div>
@@ -755,14 +758,15 @@ input[type="month"].price-input {
         <div class="chip" data-value="other" onclick="toggleChip(this)">Other</div>
       </div>
     </div>
-    
-    <div class="fp-footer">
-      <button class="fp-btn secondary" onclick="clearAllFilters()">Reset all</button>
-      <button class="fp-btn primary" onclick="applyFilters()">Show results</button>
-    </div>
-  </div>
-</div>
 
+  </div> <!-- fp-body -->
+
+  <div class="fp-footer">
+    <button class="fp-btn secondary" onclick="clearAllFilters()">Reset all</button>
+    <button class="fp-btn primary" onclick="applyFilters()">Show results</button>
+  </div>
+
+</div> <!-- filter-panel -->
 <!-- ── MAIN CONTENT ── -->
 <div class="app-body">
 
@@ -1176,7 +1180,15 @@ setupTog('tog-metro',()=>setMetroVis(true),()=>setMetroVis(false),true);
 setupTog('tog-districts',()=>setDistrictsVis(true),()=>setDistrictsVis(false),false);
 
 let nightMode=true;
-document.getElementById('styleBtn').onclick=()=>{nightMode=!nightMode;map.setStyle(nightMode?'mapbox://styles/mapbox/navigation-night-v1':'mapbox://styles/mapbox/navigation-day-v1');document.getElementById('styleLabel').textContent=nightMode?'🌙 Night':'☀️ Day';};
+document.getElementById('styleBtn').onclick=()=>{
+  nightMode=!nightMode;
+
+  map.setStyle(
+    nightMode
+      ? 'mapbox://styles/mapbox/navigation-night-v1'
+      : 'mapbox://styles/mapbox/navigation-day-v1'
+  );
+};
 document.getElementById('zin').onclick=()=>map.zoomIn();
 document.getElementById('zout').onclick=()=>map.zoomOut();
 
@@ -1274,11 +1286,13 @@ function filterLocationChips(val){document.querySelectorAll('#location .chip').f
 
 function updateFilterCount(){
   let n=0;
-  n+=document.querySelectorAll('#location .chip.selected').length;
   n+=document.querySelectorAll('#belowMarket .chip.selected').length;
+  n+=document.querySelectorAll('#belowOP .chip.selected').length;
   n+=document.querySelectorAll('#bedrooms .chip.selected').length;
   n+=document.querySelectorAll('#propType .chip.selected').length;
-  n+=document.querySelectorAll('#payPlan .chip.selected').length;
+  n+=document.querySelectorAll('#paymentPlan .chip.selected').length;
+  n+=document.querySelectorAll('#view .chip.selected').length;
+  n+=document.querySelectorAll('#developer .chip.selected').length;
   if(document.getElementById('priceMin').value||document.getElementById('priceMax').value)n++;
   const ps=document.querySelectorAll('#propStatus .chip.selected').length;if(ps<2)n++;
   document.getElementById('filterCount').textContent=n;
