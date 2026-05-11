@@ -247,7 +247,23 @@ header {
 .fp-close { width:28px; height:28px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(255,255,255,0.7); font-size:16px; transition:all .15s; }
 .fp-close:hover { background:rgba(255,255,255,0.15); color:#fff; }
 
-.fp-body { flex:1; overflow-y:auto; min-height:0; }
+.fp-body {
+  flex:1;
+  overflow-y:auto;
+  min-height:0;
+
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(173,220,240,0.28) 0%,
+      rgba(173,220,240,0.12) 100%
+    );
+}
 .fp-body::-webkit-scrollbar { width:3px; }
 .fp-body::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.25); border-radius:2px; }
 
@@ -259,7 +275,21 @@ header {
 .fp-btn.primary:hover { background:var(--dark-2); }
 
 /* Filter sections */
-.fs { padding:16px; border-bottom:1px solid var(--light-3); }
+.fs {
+  background:rgba(252,250,246,0.96);
+  border:1px solid rgba(255,255,255,0.55);
+  border-radius:22px;
+  padding:18px;
+
+  box-shadow:
+    0 4px 18px rgba(10,4,35,0.06),
+    0 1px 3px rgba(10,4,35,0.04);
+
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+
+  margin:0;
+}
 .fs:last-child { border-bottom:none; }
 .fs-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
 .fs-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; }
