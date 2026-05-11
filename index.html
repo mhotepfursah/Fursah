@@ -80,7 +80,13 @@ header {
   display:none; align-items:center; justify-content:center;
 }
 .filter-count.show { display:flex; }
-.hdr-right { display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0; }
+.hdr-right {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-left:auto;
+  flex-shrink:0;
+}
 .meta { font-size:10px; color:rgba(255,255,255,0.3); border-right:1px solid var(--border-dark); padding-right:8px; }
 .icon-btn {
   width:30px; height:30px; background:rgba(255,255,255,0.05);
@@ -90,7 +96,6 @@ header {
 }
 .icon-btn:hover,.icon-btn.active { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
 .icon-btn svg { width:13px; height:13px; }
-.bdg { position:absolute; top:-4px; right:-4px; width:14px; height:14px; background:var(--gold); border-radius:50%; font-size:8px; font-weight:700; color:var(--dark); display:flex; align-items:center; justify-content:center; border:1.5px solid var(--dark); }
 
 /* ── LAYOUT ── */
 .app-body { flex:1; display:flex; overflow:hidden; position:relative; }
@@ -347,6 +352,99 @@ input[type="month"].price-input {
   appearance: none;
   -webkit-appearance: none;
 }
+/* Premium segmented toggle for Ready / Off-Plan */
+.prop-toggle {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  background:var(--light-2);
+  border:1px solid var(--light-3);
+  border-radius:999px;
+  padding:4px;
+}
+
+.prop-toggle-btn {
+  height:34px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-mid);
+  cursor:pointer;
+  transition:all .18s ease;
+  user-select:none;
+}
+
+.prop-toggle-btn:hover {
+  color:var(--gold);
+}
+
+.prop-toggle-btn.active-ready,
+.prop-toggle-btn.active-offplan,
+.prop-toggle-btn.selected {
+  background:var(--dark);
+  color:var(--text-white);
+  box-shadow:0 3px 10px rgba(10,4,35,0.18);
+}
+
+/* GenieMap style switch for Post-Handover */
+.switch-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.switch-label {
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-dark);
+}
+
+.switch {
+  position:relative;
+  display:inline-block;
+  width:44px;
+  height:24px;
+}
+
+.switch input {
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.slider {
+  position:absolute;
+  inset:0;
+  background:#D9D7DF;
+  border-radius:999px;
+  transition:.2s;
+  cursor:pointer;
+}
+
+.slider:before {
+  content:"";
+  position:absolute;
+  height:18px;
+  width:18px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+}
+
+.switch input:checked + .slider {
+  background:var(--dark);
+}
+
+.switch input:checked + .slider:before {
+  transform:translateX(20px);
+}
+
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
@@ -416,14 +514,18 @@ input[type="month"].price-input {
       <div class="distress-text">All listings are verified distress deals</div>
     </div>
 
-    <!-- Property Status -->
-    <div class="fs">
-      <div class="fs-head"><div class="fs-label">Property Status</div><div class="fs-reset" onclick="resetChips('propStatus',false)">Reset</div></div>
-      <div class="prop-toggle" id="propStatus">
-        <div class="prop-toggle-btn active-ready" data-value="ready" onclick="setPropStatus('ready')">Ready</div>
-        <div class="prop-toggle-btn" data-value="offplan" onclick="setPropStatus('offplan')">Off-Plan</div>
-      </div>
-    </div>
+<!-- Property Status -->
+<div class="fs">
+  <div class="fs-head">
+    <div class="fs-label">Property Status</div>
+    <div class="fs-reset" onclick="setPropStatus('ready')">Reset</div>
+  </div>
+
+  <div class="prop-toggle" id="propStatus">
+    <div class="prop-toggle-btn active-ready selected" data-value="ready" onclick="setPropStatus('ready')">Ready</div>
+    <div class="prop-toggle-btn" data-value="offplan" onclick="setPropStatus('offplan')">Off-Plan</div>
+  </div>
+</div>
 
     <!-- Off-Plan Filters (hidden by default) -->
     <div id="offplanFilters" style="display:none">
@@ -510,15 +612,25 @@ input[type="month"].price-input {
         </div>
       </div>
 
-      <!-- Post Handover -->
-      <div class="fs">
-        <div class="fs-head"><div class="fs-label">Post-Handover</div></div>
-        <div class="prop-toggle" id="postHandover">
-          <div class="prop-toggle-btn" data-value="yes" onclick="setPostHandover('yes')">Yes</div>
-          <div class="prop-toggle-btn" data-value="no" onclick="setPostHandover('no')">No</div>
-        </div>
-      </div>
+<!-- Post Handover -->
+<div class="fs">
+  <div class="fs-head">
+    <div class="fs-label">Post-Handover</div>
+  </div>
 
+  <div class="switch-row">
+    <span class="switch-label">Available</span>
+
+    <label class="switch">
+      <input 
+        type="checkbox" 
+        id="postHandoverSwitch"
+        onchange="updateFilterCount()"
+      >
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
     </div><!-- /offplanFilters -->
 
     <!-- Below Market % — Ready only -->
@@ -1174,10 +1286,18 @@ function updateFilterCount(){
   document.getElementById('clearBtn').style.display=n>0?'flex':'none';
 }
 function clearAllFilters(){
-  resetChips('propStatus',true);
-  resetChips('location',false);
-  resetChips('belowMarket',false);resetPrice();
-  resetChips('bedrooms',false);resetChips('propType',false);resetChips('payPlan',false);
+  document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
+
+  resetPrice();
+  resetTotalCost();
+  resetDownpayment();
+  resetHandover();
+
+  const post = document.getElementById('postHandoverSwitch');
+  if(post) post.checked = false;
+
+  setPropStatus('ready');
+  updateUnitFilters();
   updateFilterCount();
 }
 function applyFilters(){toggleFilters();}
