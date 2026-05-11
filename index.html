@@ -326,6 +326,30 @@ header {
 .gc-market { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
 .gc-market-price { font-size:11px; color:var(--text-muted); text-decoration:line-through; }
 .gc-agent { display:flex; align-items:center; gap:7px; margin-top:10px; padding-top:10px; border-top:1px solid var(--light-3); }
+/* Fix Off-Plan price/date input layout */
+.price-row {
+  display: grid;
+  grid-template-columns: 1fr 18px 1fr;
+  gap: 8px;
+  align-items: end;
+}
+
+.price-col {
+  min-width: 0;
+}
+
+.price-input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Fix month input overflow */
+input[type="month"].price-input {
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
@@ -443,16 +467,39 @@ header {
         </div>
       </div>
 
-      <!-- Handover Date -->
-      <div class="fs">
-        <div class="fs-head"><div class="fs-label">Handover Date</div><div class="fs-reset" onclick="resetHandover()">Reset</div></div>
-        <div class="price-row">
-          <div class="price-col"><div class="price-label">From</div><input class="price-input" id="handoverFrom" type="month" oninput="updateFilterCount()" style="height:34px;width:100%;min-width:0;"></div>
-          <div class="price-sep">—</div>
-          <div class="price-col"><div class="price-label">To</div><input class="price-input" id="handoverTo" type="month" oninput="updateFilterCount()" style="height:34px;width:100%;min-width:0;"></div>
-        </div>
-      </div>
+<!-- Handover Date -->
+<div class="fs">
+  <div class="fs-head">
+    <div class="fs-label">Handover Date</div>
+    <div class="fs-reset" onclick="resetHandover()">Reset</div>
+  </div>
 
+  <div class="price-row">
+    
+    <div class="price-col">
+      <div class="price-label">From</div>
+      <input 
+        class="price-input handover-input"
+        id="handoverFrom"
+        type="month"
+        oninput="updateFilterCount()"
+      >
+    </div>
+
+    <div class="price-sep">—</div>
+
+    <div class="price-col">
+      <div class="price-label">To</div>
+      <input 
+        class="price-input handover-input"
+        id="handoverTo"
+        type="month"
+        oninput="updateFilterCount()"
+      >
+    </div>
+
+  </div>
+</div>
       <!-- Original Payment Plan -->
       <div class="fs">
         <div class="fs-head"><div class="fs-label">Original Payment Plan</div><div class="fs-reset" onclick="resetChips('paymentPlan',false)">Reset</div></div>
