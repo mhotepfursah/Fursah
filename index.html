@@ -928,13 +928,18 @@ input[type="month"].price-input {
     </div>
 
     <!-- Financing -->
-    <div class="fs">
-      <div class="fs-head"><div class="fs-label">Financing</div><div class="fs-reset" onclick="resetChips('financing',false)">Reset</div></div>
-      <div class="chips" id="financing">
-        <div class="chip" data-value="mortgage" onclick="toggleChipSingle(this,'financing')">Mortgage Friendly</div>
-        <div class="chip" data-value="cash" onclick="toggleChipSingle(this,'financing')">Cash Only</div>
-      </div>
-    </div>
+<!-- Financing -->
+<div class="fs" id="financingFilter">
+  <div class="fs-head">
+    <div class="fs-label">Financing</div>
+    <div class="fs-reset" onclick="resetChips('financing',false)">Reset</div>
+  </div>
+
+  <div class="chips" id="financing">
+    <div class="chip" data-value="mortgage" onclick="toggleChipSingle(this,'financing')">Mortgage Friendly</div>
+    <div class="chip" data-value="cash" onclick="toggleChipSingle(this,'financing')">Cash Only</div>
+  </div>
+</div>
 
     <!-- Developer -->
     <div class="fs">
@@ -1427,10 +1432,18 @@ function setPropStatus(val){
   document.querySelectorAll('.prop-toggle-btn').forEach(b=>{
     b.classList.remove('active-ready','active-offplan','selected');
   });
+
   const btn=document.querySelector(`.prop-toggle-btn[data-value="${val}"]`);
   btn.classList.add(val==='ready'?'active-ready':'active-offplan','selected');
-  document.getElementById('offplanFilters').style.display=val==='offplan'?'flex':'none';
-  document.getElementById('readyFilters').style.display=val==='ready'?'block':'none';
+
+  document.getElementById('offplanFilters').style.display = val === 'offplan' ? 'flex' : 'none';
+  document.getElementById('readyFilters').style.display = val === 'ready' ? 'block' : 'none';
+
+  const financingFilter = document.getElementById('financingFilter');
+  if (financingFilter) {
+    financingFilter.style.display = val === 'offplan' ? 'none' : '';
+  }
+
   updateFilterCount();
 }
 function setPostHandover(val){
