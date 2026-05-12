@@ -1760,6 +1760,61 @@ function add3DBuildings(){
     labelLayerId
   );
 }
+function openListingPanel(listing){
+  viewMode = 1;
+
+  const lp = document.getElementById('leftPanel');
+  const gv = document.getElementById('gridView');
+
+  lp.classList.remove('hidden');
+  gv.classList.remove('active');
+  document.body.classList.add('list-panel-open');
+
+  document.getElementById('viewBtn').classList.add('active');
+
+  const list = document.querySelector('.listings-list');
+
+  list.innerHTML = `
+    <div class="card ${listing.featured ? 'featured' : ''}">
+      <div class="card-img" style="background:${listing.bg}">
+        ${listing.emoji}
+        <div class="img-status ${listing.status === 'Off-Plan' ? 'offplan' : 'ready'}">${listing.status}</div>
+        <div class="img-discount">${listing.discount}</div>
+        ${listing.featured ? '<div class="featured-label">Featured Deal</div>' : ''}
+      </div>
+
+      <div class="card-body">
+        <div class="card-project">${listing.project}</div>
+        <div class="card-location">${listing.location}</div>
+
+        <div class="card-specs">
+          <div class="spec"><div class="spec-val">${listing.beds}</div><div class="spec-label">Beds</div></div>
+          <div class="spec"><div class="spec-val">${listing.baths}</div><div class="spec-label">Baths</div></div>
+          <div class="spec"><div class="spec-val">${listing.sqft}</div><div class="spec-label">Sqft</div></div>
+          ${listing.view ? `<div class="spec"><div class="spec-val">${listing.view}</div><div class="spec-label">View</div></div>` : ''}
+        </div>
+
+        <div class="card-price-section">
+          <div class="asking-label">Asking Price</div>
+          <div class="asking-price">${listing.askingPrice}</div>
+
+          <div class="market-price-row">
+            <div class="market-price">${listing.marketPrice}</div>
+            <div class="distress-reason ${listing.reasonClass}">${listing.reason}</div>
+          </div>
+        </div>
+
+        <div class="card-agent">
+          <div class="agent-av">${listing.agentInitials}</div>
+          <div class="agent-name">${listing.agentName}</div>
+          <div class="agent-date">${listing.date}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(()=>map.resize(),300);
+}  
 
 function addMarkers(){
 
@@ -1790,6 +1845,11 @@ function addMarkers(){
     `;
 
     el.textContent = listing.label;
+
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openListingPanel(listing);
+    });
 
     if(listing.featured){
       el.style.border = '1px solid #C8973A';
