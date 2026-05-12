@@ -1537,7 +1537,8 @@ function addMetro(){
             18, line.width * 2.2
           ],
           'line-opacity':line.future ? 0.55 : 0.98,
-          ...(line.future ? {'line-dasharray':[3,2]} : {})
+          ...(line.future ? {   'line-dasharray':[1.2,1.2] } : {})
+          'line-blur': line.future ? 0.5 : 0,
         }
       });
     }
@@ -1546,7 +1547,22 @@ function addMetro(){
       const el=document.createElement('div');
       const sz=line.future?10:14;
 
-      el.style.cssText=`width:${sz}px;height:${sz}px;background:#FCFAF6;border-radius:50%;border:4px solid ${line.color};box-shadow:0 0 0 3px rgba(255,255,255,0.9),0 3px 10px rgba(10,4,35,0.45);cursor:pointer;display:none;`;
+    el.style.cssText=`
+      width:${sz}px;
+      height:${sz}px;
+      background:${line.color};
+      border-radius:50%;
+      border:2px solid #FCFAF6;
+      box-shadow:0 2px 8px rgba(10,4,35,0.35);
+      cursor:pointer;
+      display:none;
+      color:#fff;
+      font-size:${line.future ? 7 : 9}px;
+      font-weight:800;
+      line-height:${sz - 4}px;
+      text-align:center;
+    `;
+    el.textContent = 'M';
 
       el.addEventListener('click',(e)=>{
         e.stopPropagation();
@@ -1579,8 +1595,17 @@ function setMetroVis(on){
     if(map.getLayer(line.id+'-glow'))map.setLayoutProperty(line.id+'-glow','visibility',v);
     if(map.getLayer(line.id+'-branch-line'))map.setLayoutProperty(line.id+'-branch-line','visibility',v);
   });
-  markerGroups.metro.forEach(m=>m.el.style.display=on?'block':'none');
+  updateMetroStationVisibility();
 }
+function updateMetroStationVisibility(){
+  const showStations = metroVisible && map.getZoom() >= 12.5;
+
+  markerGroups.metro.forEach(m=>{
+    m.el.style.display = showStations ? 'block' : 'none';
+  });
+}
+
+map.on('zoom', updateMetroStationVisibility);
 const listings=[{c:[55.2796,25.1972],lbl:'AED 3.2M'},{c:[55.2651,25.1865],lbl:'AED 1.75M'},{c:[55.1760,25.0950],lbl:'AED 4.1M'},{c:[55.2404,25.1921],lbl:'AED 1.2M'},{c:[55.1348,25.1124],lbl:'AED 2.6M'},{c:[55.3230,25.2285],lbl:'AED 5.8M'},{c:[55.2099,25.0657],lbl:'AED 1.38M'},{c:[55.1900,25.1500],lbl:'AED 780K'}];
 
 const markerGroups={listings:[],metro:[]};
