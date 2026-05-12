@@ -1563,7 +1563,16 @@ function addMetro(){
       text-align:center;
     `;
     el.textContent = 'M';
+    el.title = s.n;
 
+    el.addEventListener('mouseenter',()=>{
+      el.style.transform = 'scale(1.18)';
+    });
+
+    el.addEventListener('mouseleave',()=>{
+    el.style.transform = 'scale(1)';
+    });
+        
       el.addEventListener('click',(e)=>{
         e.stopPropagation();
         document.querySelectorAll('.metro-popup').forEach(p=>p.remove());
@@ -1606,6 +1615,8 @@ function updateMetroStationVisibility(){
 }
 
 map.on('zoom', updateMetroStationVisibility);
+map.on('moveend', updateMetroStationVisibility);
+map.on('load', updateMetroStationVisibility);
 const listings=[{c:[55.2796,25.1972],lbl:'AED 3.2M'},{c:[55.2651,25.1865],lbl:'AED 1.75M'},{c:[55.1760,25.0950],lbl:'AED 4.1M'},{c:[55.2404,25.1921],lbl:'AED 1.2M'},{c:[55.1348,25.1124],lbl:'AED 2.6M'},{c:[55.3230,25.2285],lbl:'AED 5.8M'},{c:[55.2099,25.0657],lbl:'AED 1.38M'},{c:[55.1900,25.1500],lbl:'AED 780K'}];
 
 const markerGroups={listings:[],metro:[]};
@@ -1664,6 +1675,7 @@ map.on('style.load',()=>{
   add3DBuildings();
   if(!metroVisible)setMetroVis(false);
   if(districtsVisible)addDistricts();
+  updateMetroStationVisibility();
 });
 
 
