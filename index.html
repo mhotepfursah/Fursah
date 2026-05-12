@@ -853,7 +853,12 @@ input[type="month"].price-input {
 
   <div class="hdr-right">
   <div class="settings-wrap">
-  <div class="meta" id="settingsBtn" onclick="toggleSettingsPanel()">🇬🇧 <span>AED</span> <span>|</span> <span>sqft</span></div>
+  <div class="meta" id="settingsBtn" onclick="toggleSettingsPanel()">
+  🇬🇧
+  <span id="currencyDisplay">AED</span>
+  <span>|</span>
+  <span id="measureDisplay">sqft</span>
+</div>
 
   <div class="settings-panel" id="settingsPanel">
 
@@ -1729,9 +1734,35 @@ function toggleSettingsPanel(){
 
 function setSettingPill(btn){
   const section = btn.closest('.settings-section');
+
   section.querySelectorAll('.setting-pill').forEach(pill => {
     pill.classList.remove('active');
   });
+
+  btn.classList.add('active');
+
+  // Update top button dynamically
+  const sectionTitle = section.querySelector('.settings-title').textContent.trim();
+
+  if(sectionTitle === 'Currency'){
+    document.getElementById('currencyDisplay').textContent = btn.textContent.trim();
+  }
+
+  if(sectionTitle === 'Measures'){
+    document.getElementById('measureDisplay').textContent = btn.textContent.trim();
+  }
+
+  if(sectionTitle === 'Language'){
+    const settingsBtn = document.getElementById('settingsBtn');
+
+    let flag = '🇬🇧';
+
+    if(btn.textContent.includes('العربية')) flag = '🇦🇪';
+    if(btn.textContent.includes('Русский')) flag = '🇷🇺';
+
+    settingsBtn.childNodes[0].textContent = flag + ' ';
+  }
+}
 
   btn.classList.add('active');
 }
