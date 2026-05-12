@@ -1491,16 +1491,41 @@ function addMetro(){
     if(!map.getSource(line.id)){
       map.addSource(line.id,{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:line.coords}}});
       if(!line.future){
-        map.addLayer({id:line.id+'-glow',type:'line',source:line.id,
-          layout:{visibility:'visible'},
-          paint:{'line-color':line.color,'line-width':line.width*2.5,'line-opacity':0.12,'line-blur':5}});
-      }
-      map.addLayer({id:line.id+'-line',type:'line',source:line.id,
-        layout:{'line-join':'round','line-cap':'round',visibility:'visible'},
-        paint:{'line-color':line.color,'line-width':line.width,
-               'line-opacity':line.future?0.6:1,
-               ...(line.future?{'line-dasharray':[4,3]}:{})}});
-    }
+        map.addLayer({
+          id:line.id+'-glow',
+          type:'line',
+          source:line.id,
+          layout:{'line-join':'round','line-cap':'round',visibility:'visible'},
+          paint:{
+          'line-color':line.color,
+          'line-width':line.width * 5,
+          'line-opacity':0.22,
+          'line-blur':6
+          }
+       });
+  map.addLayer({
+  id:line.id+'-line',
+  type:'line',
+  source:line.id,
+  layout:{
+    'line-join':'round',
+    'line-cap':'round',
+    visibility:'visible'
+  },
+  paint:{
+    'line-color':line.color,
+    'line-width':[
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      10, line.width * 0.7,
+      14, line.width * 1.4,
+      18, line.width * 2.2
+    ],
+    'line-opacity':line.future ? 0.55 : 0.98,
+    ...(line.future ? {'line-dasharray':[3,2]} : {})
+  }
+});
     // Branch line (cyan only)
     if(line.branch&&!map.getSource(line.id+'-branch')){
       map.addSource(line.id+'-branch',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:line.branch}}});
@@ -1511,8 +1536,8 @@ function addMetro(){
     // Station dots + popup
     line.stations.forEach(s=>{
       const el=document.createElement('div');
-      const sz=line.future?8:10;
-      el.style.cssText=`width:${sz}px;height:${sz}px;background:#fff;border-radius:50%;border:2.5px solid ${line.color};box-shadow:0 1px 4px rgba(0,0,0,0.5);cursor:pointer;display:none;`;
+      const sz=line.future?10:14;
+      el.style.cssText=`width:${sz}px;height:${sz}px;background:#FCFAF6;border-radius:50%;border:4px solid ${line.color};box-shadow:0 0 0 3px rgba(255,255,255,0.9),0 3px 10px rgba(10,4,35,0.45);cursor:pointer;display:none;`;
       // Click popup
       el.addEventListener('click',(e)=>{
         e.stopPropagation();
