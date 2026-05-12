@@ -1750,6 +1750,8 @@ function setSettingPill(btn){
     pill.classList.remove('active');
   });
 
+  btn.classList.add('active');
+
   // Update top button dynamically
   const sectionTitle = section.querySelector('.settings-title').textContent.trim();
 
@@ -1771,9 +1773,6 @@ function setSettingPill(btn){
 
     settingsBtn.childNodes[0].textContent = flag + ' ';
   }
-}
-
-  btn.classList.add('active');
 }
 
 document.addEventListener('click', function(e){
