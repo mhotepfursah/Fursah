@@ -1504,6 +1504,32 @@ const listings=[{c:[55.2796,25.1972],lbl:'AED 3.2M'},{c:[55.2651,25.1865],lbl:'A
 const markerGroups={listings:[],metro:[]};
 let metroAdded=false,metroVisible=true;
 
+function add3DBuildings(){
+  const layers = map.getStyle().layers;
+  const labelLayerId = layers.find(
+    layer => layer.type === 'symbol' && layer.layout && layer.layout['text-field']
+  )?.id;
+
+  if(map.getLayer('3d-buildings')) return;
+
+  map.addLayer(
+    {
+      id:'3d-buildings',
+      source:'composite',
+      'source-layer':'building',
+      filter:['==','extrude','true'],
+      type:'fill-extrusion',
+      minzoom:15,
+      paint:{
+        'fill-extrusion-color':'#C8973A',
+        'fill-extrusion-height':['get','height'],
+        'fill-extrusion-base':['get','min_height'],
+        'fill-extrusion-opacity':0.35
+      }
+    },
+    labelLayerId
+  );
+}
 
 function addMarkers(){
   markerGroups.listings.forEach(m=>{try{m.remove()}catch(e){}});
@@ -1520,6 +1546,7 @@ function addMarkers(){
 map.on('load',()=>{
   addMarkers();
   addMetro();
+  add3DBuildings();
 });
 
 map.on('style.load',()=>{
@@ -1527,6 +1554,7 @@ map.on('style.load',()=>{
   markerGroups.metro=[];
   addMarkers();
   addMetro();
+  add3DBuildings();
   if(!metroVisible)setMetroVis(false);
   if(districtsVisible)addDistricts();
 });
