@@ -1682,7 +1682,54 @@ function updateMetroStationVisibility(){
 map.on('zoom', updateMetroStationVisibility);
 map.on('moveend', updateMetroStationVisibility);
 map.on('load', updateMetroStationVisibility);
-const listings=[{c:[55.2796,25.1972],lbl:'AED 3.2M'},{c:[55.2651,25.1865],lbl:'AED 1.75M'},{c:[55.1760,25.0950],lbl:'AED 4.1M'},{c:[55.2404,25.1921],lbl:'AED 1.2M'},{c:[55.1348,25.1124],lbl:'AED 2.6M'},{c:[55.3230,25.2285],lbl:'AED 5.8M'},{c:[55.2099,25.0657],lbl:'AED 1.38M'},{c:[55.1900,25.1500],lbl:'AED 780K'}];
+const listings = [
+  {
+    id: 1,
+    coords: [55.2796, 25.1972],
+    label: 'AED 3.2M',
+    status: 'Ready',
+    discount: '−22%',
+    featured: true,
+    project: 'Bluewaters Residences — Tower 6',
+    location: 'Bluewaters Island, Dubai',
+    beds: 3,
+    baths: 2,
+    sqft: '1,840',
+    view: 'Sea',
+    askingPrice: 'AED 3,200,000',
+    marketPrice: 'AED 4,100,000',
+    reason: 'Relocation',
+    reasonClass: 'reason-relocation',
+    agentInitials: 'MH',
+    agentName: 'Mohamad H.',
+    date: '02 May 26',
+    bg: 'linear-gradient(135deg,#1A3050,#0A0423)',
+    emoji: '🏙️'
+  },
+  {
+    id: 2,
+    coords: [55.2651, 25.1865],
+    label: 'AED 1.75M',
+    status: 'Off-Plan',
+    discount: '−15%',
+    featured: false,
+    project: 'Creek Waters 2 — Unit 1204',
+    location: 'Dubai Creek Harbour',
+    beds: 2,
+    baths: 2,
+    sqft: '1,120',
+    view: '',
+    askingPrice: 'AED 1,750,000',
+    marketPrice: 'AED 2,060,000',
+    reason: 'Mortgage',
+    reasonClass: 'reason-mortgage',
+    agentInitials: 'KA',
+    agentName: 'Khalid Al Ameri',
+    date: '02 May 26',
+    bg: 'linear-gradient(135deg,#1A3A2A,#0A0423)',
+    emoji: '🌊'
+  }
+];
 
 const markerGroups={listings:[],metro:[]};
 let metroAdded=false,metroVisible=true;
@@ -1715,17 +1762,60 @@ function add3DBuildings(){
 }
 
 function addMarkers(){
-  markerGroups.listings.forEach(m=>{try{m.remove()}catch(e){}});
-  markerGroups.listings=[];
-  listings.forEach(p=>{
-    const el=document.createElement('div');
-    el.style.cssText='background:#0A0423;color:#FCFAF6;font-size:10px;font-weight:600;padding:5px 10px;border-radius:14px;cursor:pointer;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.5);border:1px solid rgba(200,151,58,0.3);font-family:Oswald,sans-serif;letter-spacing:0.3px;transition:transform .1s;';
-    el.textContent=p.lbl;
-    el.onmouseenter=()=>el.style.transform='scale(1.08)';
-    el.onmouseleave=()=>el.style.transform='scale(1)';
-    markerGroups.listings.push(new mapboxgl.Marker({element:el,anchor:'center'}).setLngLat(p.c).addTo(map));
+
+  markerGroups.listings.forEach(m=>{
+    try{ m.remove(); } catch(e){}
+  });
+
+  markerGroups.listings = [];
+
+  listings.forEach(listing=>{
+
+    const el = document.createElement('div');
+
+    el.style.cssText = `
+      background:#0A0423;
+      color:#FCFAF6;
+      font-size:10px;
+      font-weight:600;
+      padding:5px 10px;
+      border-radius:14px;
+      cursor:pointer;
+      white-space:nowrap;
+      box-shadow:0 2px 10px rgba(0,0,0,0.5);
+      border:1px solid rgba(200,151,58,0.3);
+      font-family:Oswald,sans-serif;
+      letter-spacing:0.3px;
+      transition:all .12s ease;
+    `;
+
+    el.textContent = listing.label;
+
+    if(listing.featured){
+      el.style.border = '1px solid #C8973A';
+      el.style.boxShadow = '0 0 18px rgba(200,151,58,0.35)';
+    }
+
+    el.addEventListener('mouseenter',()=>{
+      el.style.transform = 'scale(1.08)';
+    });
+
+    el.addEventListener('mouseleave',()=>{
+      el.style.transform = 'scale(1)';
+    });
+
+    const marker = new mapboxgl.Marker({
+      element: el,
+      anchor:'center'
+    })
+    .setLngLat(listing.coords)
+    .addTo(map);
+
+    markerGroups.listings.push(marker);
+
   });
 }
+
 map.on('load',()=>{
   addMarkers();
   addMetro();
