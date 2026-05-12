@@ -1620,14 +1620,12 @@ let filterOpen=false;
 function toggleFilters(){
   filterOpen=!filterOpen;
   document.getElementById('filterPanel').classList.toggle('open',filterOpen);
-  document.getElementById('backdrop').classList.toggle('show',filterOpen);
   document.getElementById('filterBtn').classList.toggle('active',filterOpen);
   document.getElementById('mapLpanel').classList.remove('open');
 }
 function closeAllOverlays(){
   filterOpen=false;
   document.getElementById('filterPanel').classList.remove('open');
-  document.getElementById('backdrop').classList.remove('show');
   document.getElementById('filterBtn').classList.remove('active');
   document.getElementById('searchDropdown').classList.remove('open');
   document.getElementById('mapLpanel').classList.remove('open');
