@@ -1517,8 +1517,19 @@ function addMarkers(){
     markerGroups.listings.push(new mapboxgl.Marker({element:el,anchor:'center'}).setLngLat(p.c).addTo(map));
   });
 }
-map.on('load',()=>{addMarkers();addMetro();add3D();});
-map.on('style.load',()=>{metroAdded=false;markerGroups.metro=[];addMarkers();addMetro();add3D();if(!metroVisible)setMetroVis(false);if(districtsVisible)addDistricts();});
+map.on('load',()=>{
+  addMarkers();
+  addMetro();
+});
+
+map.on('style.load',()=>{
+  metroAdded=false;
+  markerGroups.metro=[];
+  addMarkers();
+  addMetro();
+  if(!metroVisible)setMetroVis(false);
+  if(districtsVisible)addDistricts();
+});
 
 
 function setupTog(id,onFn,offFn,on){const t=document.getElementById(id);if(!on)t.classList.add('off');t.onclick=()=>{const off=t.classList.toggle('off');off?offFn():onFn();};}
@@ -1738,8 +1749,6 @@ function setSettingPill(btn){
   section.querySelectorAll('.setting-pill').forEach(pill => {
     pill.classList.remove('active');
   });
-
-  btn.classList.add('active');
 
   // Update top button dynamically
   const sectionTitle = section.querySelector('.settings-title').textContent.trim();
