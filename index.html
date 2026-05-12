@@ -1563,7 +1563,22 @@ function addMetro(){
       text-align:center;
     `;
     el.textContent = 'M';
-    el.title = s.n;
+    const label = document.createElement('div');
+      
+      label.textContent = s.n;
+      
+      label.style.cssText = `
+        margin-top:18px;
+        font-size:10px;
+        font-weight:600;
+        color:#FCFAF6;
+        font-family:Oswald,sans-serif;
+        white-space:nowrap;
+        text-shadow:0 1px 4px rgba(0,0,0,0.9);
+        display:none;
+      `;
+
+el.appendChild(label);
 
 el.addEventListener('mouseenter',()=>{
   el.style.width = (sz + 3) + 'px';
@@ -1611,10 +1626,20 @@ function setMetroVis(on){
   updateMetroStationVisibility();
 }
 function updateMetroStationVisibility(){
+
   const showStations = metroVisible && map.getZoom() >= 12.5;
+  const showLabels = metroVisible && map.getZoom() >= 14.2;
 
   markerGroups.metro.forEach(m=>{
+
     m.el.style.display = showStations ? 'block' : 'none';
+
+    const label = m.el.querySelector('div');
+
+    if(label){
+      label.style.display = showLabels ? 'block' : 'none';
+    }
+
   });
 }
 
