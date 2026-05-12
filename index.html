@@ -1565,15 +1565,19 @@ function addMetro(){
     el.textContent = 'M';
     el.title = s.n;
 
-    el.addEventListener('mouseenter',()=>{
-      el.style.transform = 'scale(1.18)';
-    });
+el.addEventListener('mouseenter',()=>{
+  el.style.width = (sz + 3) + 'px';
+  el.style.height = (sz + 3) + 'px';
+  el.style.lineHeight = (sz - 1) + 'px';
+});
 
-    el.addEventListener('mouseleave',()=>{
-    el.style.transform = 'scale(1)';
-    });
+el.addEventListener('mouseleave',()=>{
+  el.style.width = sz + 'px';
+  el.style.height = sz + 'px';
+  el.style.lineHeight = (sz - 4) + 'px';
+});
         
-      el.addEventListener('click',(e)=>{
+    el.addEventListener('click',(e)=>{
         e.stopPropagation();
         document.querySelectorAll('.metro-popup').forEach(p=>p.remove());
 
