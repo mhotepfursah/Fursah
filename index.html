@@ -341,6 +341,207 @@ header {
 .agent-name { font-size:11px; font-weight:600; color:var(--text-mid); }
 .agent-date { font-size:10px; color:var(--text-muted); margin-left:auto; }
 
+/* ── LISTING DETAIL PANEL ── */
+
+.listing-detail-panel{
+  position:absolute;
+  left:16px;
+  top:90px;
+  width:420px;
+  height:calc(100vh - 110px);
+
+  background:#FCFAF6;
+  border-radius:24px;
+
+  overflow-y:auto;
+  z-index:40;
+
+  transform:translateX(-110%);
+  transition:transform .28s ease;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.35);
+}
+
+.listing-detail-panel.active{
+  transform:translateX(0);
+}
+
+.ld-hero{
+  position:relative;
+  height:240px;
+  background:linear-gradient(135deg,#1A3050,#0A0423);
+}
+
+.ld-close{
+  position:absolute;
+  top:16px;
+  right:16px;
+
+  width:34px;
+  height:34px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,0.12);
+  color:white;
+
+  font-size:20px;
+  cursor:pointer;
+}
+
+.ld-badge{
+  position:absolute;
+  left:16px;
+  bottom:16px;
+
+  background:#C8973A;
+  color:#0A0423;
+
+  padding:6px 12px;
+  border-radius:999px;
+
+  font-size:11px;
+  font-weight:700;
+}
+
+.ld-discount{
+  position:absolute;
+  top:16px;
+  left:16px;
+
+  background:#0A0423;
+  color:white;
+
+  padding:6px 10px;
+  border-radius:999px;
+
+  font-size:11px;
+  font-weight:700;
+}
+
+.ld-body{
+  padding:24px;
+}
+
+.ld-body h2{
+  font-size:26px;
+  line-height:1.1;
+  margin-bottom:6px;
+  color:#0A0423;
+}
+
+.ld-body p{
+  color:#6E6484;
+  font-size:14px;
+}
+
+.ld-price{
+  margin-top:22px;
+  padding:18px;
+  border-radius:20px;
+  background:#F4F0E8;
+}
+
+.ld-price span{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:#8A80A0;
+  margin-bottom:6px;
+}
+
+.ld-price strong{
+  display:block;
+  font-size:30px;
+  color:#0A0423;
+}
+
+.ld-price small{
+  display:block;
+  margin-top:6px;
+  color:#8A80A0;
+}
+
+.ld-metrics{
+  margin-top:22px;
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.ld-metrics div{
+  background:#F4F0E8;
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+}
+
+.ld-metrics strong{
+  display:block;
+  font-size:20px;
+  color:#0A0423;
+}
+
+.ld-metrics span{
+  font-size:11px;
+  color:#8A80A0;
+}
+
+.ld-section{
+  margin-top:28px;
+}
+
+.ld-section h3{
+  font-size:15px;
+  margin-bottom:14px;
+  color:#0A0423;
+}
+
+.ld-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 0;
+
+  border-bottom:1px solid rgba(10,4,35,0.08);
+}
+
+.ld-row span{
+  color:#6E6484;
+  font-size:13px;
+}
+
+.ld-row strong{
+  color:#0A0423;
+  font-size:13px;
+}
+
+.ld-primary{
+  width:100%;
+  height:54px;
+
+  margin-top:28px;
+
+  border:none;
+  border-radius:18px;
+
+  background:#0A0423;
+  color:white;
+
+  font-size:14px;
+  font-weight:700;
+
+  cursor:pointer;
+}
+
+/* ── MAP ── */
+.map-wrap { flex:1; position:relative; z-index:var(--z-map); min-width:0; }
+
 /* ── MAP ── */
 .map-wrap { flex:1; position:relative; z-index:var(--z-map); min-width:0; }
 #map { width:100%; height:100%; }
@@ -1416,6 +1617,75 @@ input[type="month"].price-input {
   <!-- Map -->
   <div class="map-wrap" id="mapWrap" style="order:1">
     <div id="map"></div>
+    <div class="listing-detail-panel" id="listingDetailPanel">
+  <div class="ld-hero">
+    <button class="ld-close" onclick="closeListingPanel()">×</button>
+    <div class="ld-badge">Featured Deal</div>
+    <div class="ld-discount">−22%</div>
+  </div>
+
+  <div class="ld-body">
+    <h2 id="ldProject">Bluewaters Residences — Tower 6</h2>
+    <p id="ldLocation">Bluewaters Island, Dubai</p>
+
+    <div class="ld-price">
+      <span>Asking Price</span>
+      <strong id="ldAsking">AED 3,200,000</strong>
+      <small id="ldMarket">Market estimate: AED 4,100,000</small>
+    </div>
+
+    <div class="ld-metrics">
+      <div><strong>3</strong><span>Beds</span></div>
+      <div><strong>2</strong><span>Baths</span></div>
+      <div><strong>1,840</strong><span>Sqft</span></div>
+      <div><strong>Sea</strong><span>View</span></div>
+    </div>
+
+    <div class="ld-section">
+  <h3>Investment Snapshot</h3>
+
+  <div class="ld-row">
+    <span>Below market</span>
+    <strong id="ldBelowMarket">22%</strong>
+  </div>
+
+  <div class="ld-row">
+    <span>Price / sqft</span>
+    <strong id="ldPricePsf">AED 1,739</strong>
+  </div>
+
+  <div class="ld-row">
+    <span>Area median / sqft</span>
+    <strong id="ldAreaPsf">AED 2,120</strong>
+  </div>
+
+  <div class="ld-row">
+    <span>Rental yield estimate</span>
+    <strong id="ldYield">7.4%</strong>
+  </div>
+
+  <div class="ld-row">
+    <span>Exit liquidity</span>
+    <strong id="ldLiquidity">High</strong>
+  </div>
+</div>
+
+    <div class="ld-section">
+      <h3>Building / Area Data</h3>
+      <div class="ld-row"><span>Recent transactions</span><strong>131</strong></div>
+      <div class="ld-row"><span>Median price</span><strong>AED 1,000,000</strong></div>
+      <div class="ld-row"><span>Median price / sqft</span><strong>AED 1,370</strong></div>
+      <div class="ld-row"><span>Rental yield</span><strong>8%</strong></div>
+    </div>
+
+    <div class="ld-section">
+      <h3>Deal Reason</h3>
+      <p>Seller is relocating and pricing below comparable market levels for faster execution.</p>
+    </div>
+
+    <button class="ld-primary" onclick="openListingPage()">View full deal analysis</button>
+  </div>
+</div>
     <div class="threed-label" id="threedLabel">⬛ 3D — tilt with 2 fingers</div>
     <div class="ctrl-tr">
       <div class="cg">
@@ -1704,7 +1974,18 @@ const listings = [
     agentName: 'Mohamad H.',
     date: '02 May 26',
     bg: 'linear-gradient(135deg,#1A3050,#0A0423)',
-    emoji: '🏙️'
+    emoji: '🏙️',
+
+    pricePsf: 'AED 1,739',
+    areaPsf: 'AED 2,120',
+    rentalYield: '7.4%',
+    liquidity: 'High',
+    transactions12m: '131',
+    areaGrowth: '+18.2%',
+    comparableSales: [
+      { project:'Bluewaters Residences', psf:'AED 2,040', date:'Mar 2026' },
+      { project:'Address JBR', psf:'AED 2,190', date:'Feb 2026' }
+    ]
   },
   {
     id: 2,
@@ -1816,6 +2097,34 @@ function openListingPanel(listing){
   setTimeout(()=>map.resize(),300);
 }  
 
+function closeListingPanel(){
+  document.getElementById('listingDetailPanel').classList.remove('active');
+}
+
+function openListingPage(){
+  alert('Full deal analysis page comes next.');
+}
+
+function openListingDetail(listing){
+  const panel = document.getElementById('listingDetailPanel');
+
+  document.getElementById('ldProject').textContent = listing.project;
+  document.getElementById('ldLocation').textContent = listing.location;
+  document.getElementById('ldAsking').textContent = listing.askingPrice;
+  document.getElementById('ldMarket').textContent = 'Market estimate: ' + listing.marketPrice;
+  document.getElementById('ldBelowMarket').textContent = listing.discount || '—';
+  document.getElementById('ldPricePsf').textContent = listing.pricePsf || '—';
+  document.getElementById('ldAreaPsf').textContent = listing.areaPsf || '—';
+  document.getElementById('ldYield').textContent = listing.rentalYield || '—';
+  document.getElementById('ldLiquidity').textContent = listing.liquidity || '—';
+
+  panel.querySelector('.ld-hero').style.background = listing.bg;
+  panel.querySelector('.ld-badge').style.display = listing.featured ? 'block' : 'none';
+  panel.querySelector('.ld-discount').textContent = listing.discount;
+
+  panel.classList.add('active');
+}
+
 function addMarkers(){
 
   markerGroups.listings.forEach(m=>{
@@ -1848,7 +2157,7 @@ function addMarkers(){
 
     el.addEventListener('click', e => {
       e.stopPropagation();
-      openListingPanel(listing);
+      openListingDetail(listing);
     });
 
     if(listing.featured){
