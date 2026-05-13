@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fursah Deal Analysis</title>
+</head>
+<body>
+  <h1>Full Deal Analysis</h1>
+  <p id="dealName"></p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const deal = params.get('deal');
+
+    document.getElementById('dealName').textContent = deal
+      ? `Deal: ${deal}`
+      : 'No deal selected';
+  </script>
+</body>
+</html>
