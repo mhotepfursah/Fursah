@@ -1,21 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Fursah Deal Analysis</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#F4F0E8;
+  color:#0A0423;
+  font-family:Oswald,sans-serif;
+}
+
+/* HEADER */
+
+.deal-header{
+  height:68px;
+  padding:0 32px;
+  background:#FCFAF6;
+  border-bottom:1px solid #EAE4D8;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo-wordmark{
+  font-family:Georgia,serif;
+  font-weight:800;
+  letter-spacing:3px;
+  font-size:22px;
+}
+
+.back-link{
+  color:#0A0423;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:700;
+}
+
+/* HERO */
+
+.deal-hero{
+  height:430px;
+  background:linear-gradient(135deg,#1A3050,#0A0423);
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+}
+
+.hero-overlay{
+  padding:60px;
+  color:white;
+}
+
+.deal-badge{
+  display:inline-block;
+  background:#C8973A;
+  color:#0A0423;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.deal-hero h1{
+  font-size:54px;
+  line-height:1;
+  margin:0;
+  max-width:900px;
+}
+
+.deal-hero p{
+  font-size:18px;
+  opacity:.72;
+  margin-top:12px;
+}
+
+/* PAGE */
+
+.deal-page{
+  padding:32px;
+}
+
+/* SUMMARY */
+
+.deal-summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-top:-72px;
+  position:relative;
+  z-index:5;
+}
+
+.summary-card,
+.section-card{
+  background:#FCFAF6;
+  border:1px solid rgba(10,4,35,0.08);
+  border-radius:24px;
+  box-shadow:0 14px 36px rgba(10,4,35,0.08);
+}
+
+.summary-card{
+  padding:24px;
+}
+
+.summary-card span{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:#8A80A0;
+}
+
+.summary-card strong{
+  display:block;
+  margin-top:8px;
+  font-size:26px;
+}
+
+.summary-card.primary{
+  border-color:#C8973A;
+}
+
+/* GRID */
+
+.content-grid{
+  margin-top:28px;
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:28px;
+}
+
+.main-column{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+.section-card{
+  padding:28px;
+}
+
+.section-card h2{
+  margin:0 0 18px;
+  font-size:24px;
+}
+
+.section-card p{
+  color:#4A4060;
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* DATA ROWS */
+
+.data-row{
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid rgba(10,4,35,0.08);
+}
+
+.data-row span{
+  color:#6E6484;
+  font-size:13px;
+}
+
+.data-row strong{
+  font-size:14px;
+}
+
+/* TABLE */
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,
+td{
+  text-align:left;
+  padding:14px 0;
+  border-bottom:1px solid rgba(10,4,35,0.08);
+  font-size:13px;
+}
+
+th{
+  color:#8A80A0;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:11px;
+}
+
+/* SIDEBAR */
+
+.sticky-card{
+  position:sticky;
+  top:24px;
+}
+
+/* BUTTON */
+
+.primary-btn{
+  width:100%;
+  height:52px;
+  margin-top:24px;
+  border:none;
+  border-radius:16px;
+  background:#0A0423;
+  color:white;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .18s ease;
+}
+
+.primary-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(10,4,35,0.18);
+}
+
+</style>
+
 </head>
+
 <body>
-  <h1>Full Deal Analysis</h1>
-  <p id="dealName"></p>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const deal = params.get('deal');
+<header class="deal-header">
 
-    document.getElementById('dealName').textContent = deal
-      ? `Deal: ${deal}`
-      : 'No deal selected';
-  </script>
+  <div class="logo-wordmark">
+    FURSAH
+  </div>
+
+  <a href="index.html" class="back-link">
+    Back to map
+  </a>
+
+</header>
+
+<section class="deal-hero">
+
+  <div class="hero-overlay">
+
+    <div class="deal-badge" id="dealBadge">
+      22% Below Market
+    </div>
+
+    <h1 id="dealTitle">
+      Bluewaters Residences — Tower 6
+    </h1>
+
+    <p id="dealLocation">
+      Bluewaters Island, Dubai
+    </p>
+
+  </div>
+
+</section>
+
+<main class="deal-page">
+
+  <section class="deal-summary">
+
+    <div class="summary-card primary">
+      <span>Asking Price</span>
+      <strong id="dealPrice">AED 3,200,000</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Rental Yield</span>
+      <strong id="dealYield">7.4%</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Price / Sqft</span>
+      <strong id="dealPsf">AED 1,739</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Liquidity</span>
+      <strong id="dealLiquidity">High</strong>
+    </div>
+
+  </section>
+
+  <section class="content-grid">
+
+    <div class="main-column">
+
+      <div class="section-card">
+
+        <h2>
+          Investment Thesis
+        </h2>
+
+        <p>
+          This asset is positioned below comparable market levels,
+          with strong liquidity, rental demand,
+          and a clear pricing gap versus recent transactions.
+        </p>
+
+      </div>
+
+      <div class="section-card">
+
+        <h2>
+          Comparable Sales
+        </h2>
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>PSF</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+          <tbody id="compsTable">
+
+            <tr>
+              <td>Bluewaters Residences</td>
+              <td>AED 2,040</td>
+              <td>Mar 2026</td>
+            </tr>
+
+            <tr>
+              <td>JBR Tower</td>
+              <td>AED 2,180</td>
+              <td>Apr 2026</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="section-card">
+
+        <h2>
+          Area Intelligence
+        </h2>
+
+        <div class="data-row">
+          <span>12M Transactions</span>
+          <strong id="dealTransactions">131</strong>
+        </div>
+
+        <div class="data-row">
+          <span>Area Growth</span>
+          <strong id="dealGrowth">+18.2%</strong>
+        </div>
+
+        <div class="data-row">
+          <span>Area Median PSF</span>
+          <strong id="dealAreaPsf">AED 2,120</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <aside class="side-column">
+
+      <div class="section-card sticky-card">
+
+        <h2>
+          Deal Snapshot
+        </h2>
+
+        <div class="data-row">
+          <span>Beds</span>
+          <strong id="dealBeds">3</strong>
+        </div>
+
+        <div class="data-row">
+          <span>Baths</span>
+          <strong id="dealBaths">2</strong>
+        </div>
+
+        <div class="data-row">
+          <span>Size</span>
+          <strong id="dealSqft">1,840 sqft</strong>
+        </div>
+
+        <div class="data-row">
+          <span>View</span>
+          <strong id="dealView">Sea</strong>
+        </div>
+
+        <button class="primary-btn">
+          Request Full Pack
+        </button>
+
+      </div>
+
+    </aside>
+
+  </section>
+
+</main>
+
 </body>
 </html>
