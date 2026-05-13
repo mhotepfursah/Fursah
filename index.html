@@ -1992,6 +1992,7 @@ map.on('load', updateMetroStationVisibility);
 const listings = [
   {
     id: 1,
+    slug:'bluewaters-residences-tower-6',
     coords: [55.2796, 25.1972],
     label: 'AED 3.2M',
     status: 'Ready',
@@ -2026,6 +2027,7 @@ const listings = [
   },
   {
     id: 2,
+    slug:'creek-waters-2-unit-1204',
     coords: [55.2651, 25.1865],
     label: 'AED 1.75M',
     status: 'Off-Plan',
@@ -2138,18 +2140,18 @@ function closeListingPanel(){
   document.getElementById('listingDetailPanel').classList.remove('active');
 }
 
-function openListingPage(){
-  const selectedProject = document.getElementById('ldProject').textContent;
-  const slug = selectedProject
-    .toLowerCase()
-    .replaceAll(' — ', '-')
-    .replaceAll(' ', '-')
-    .replace(/[^a-z0-9-]/g, '');
+let activeListing = null;
 
-  window.location.href = `listing.html?deal=${slug}`;
+function openListingPage(){
+
+  if(!activeListing) return;
+
+  window.location.href =
+    `listing.html?deal=${activeListing.slug}`;
 }
 
 function openListingDetail(listing){
+  activeListing = listing;
   const panel = document.getElementById('listingDetailPanel');
 
   document.getElementById('ldProject').textContent = listing.project;
