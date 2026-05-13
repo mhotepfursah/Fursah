@@ -2139,7 +2139,14 @@ function closeListingPanel(){
 }
 
 function openListingPage(){
-  alert('Full deal analysis page comes next.');
+  const selectedProject = document.getElementById('ldProject').textContent;
+  const slug = selectedProject
+    .toLowerCase()
+    .replaceAll(' — ', '-')
+    .replaceAll(' ', '-')
+    .replace(/[^a-z0-9-]/g, '');
+
+  window.location.href = `listing.html?deal=${slug}`;
 }
 
 function openListingDetail(listing){
