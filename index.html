@@ -2162,6 +2162,10 @@ function openListingDetail(listing){
   panel.classList.add('active');
 }
 
+map.on('click', () => {
+  closeListingPanel();
+});
+
 function addMarkers(){
 
   markerGroups.listings.forEach(m=>{
