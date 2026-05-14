@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fursah — Listing Detail</title>
+<title>Fursah -- Listing Detail</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -26,7 +26,7 @@
 }
 html,body{font-family:'Oswald',sans-serif;background:var(--light-2);color:var(--text-dark);height:auto;overflow:visible;}
 
-/* ── NAV ── */
+/* – NAV – */
 .topbar{
 height:64px;background:var(–light);
 border-bottom:1px solid var(–light-3);
@@ -52,7 +52,7 @@ transition:all .15s;
 .tbadge.discount{background:var(–gold);color:var(–dark);}
 .tbadge.featured{background:rgba(200,151,58,0.15);color:var(–gold);border:1px solid var(–gold);}
 
-/* ── HERO ── */
+/* – HERO – */
 .hero-img{
 width:100%;height:340px;
 background:linear-gradient(135deg,#1A3050,#0A0423);
@@ -61,10 +61,10 @@ font-size:80px;position:relative;overflow:hidden;
 }
 .hero-img img{width:100%;height:100%;object-fit:cover;}
 
-/* ── PAGE LAYOUT ── */
+/* – PAGE LAYOUT – */
 .page{max-width:1200px;margin:0 auto;padding:28px 28px 60px;display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;}
 
-/* ── MAIN LEFT ── */
+/* – MAIN LEFT – */
 .main-col{}
 
 /* Title block */
@@ -76,7 +76,7 @@ font-size:80px;position:relative;overflow:hidden;
 .lspec-val{font-size:18px;font-weight:700;color:var(–dark);}
 .lspec-label{font-size:9px;color:var(–text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;}
 
-/* ── TABS ── */
+/* – TABS – */
 .tabs-wrap{background:var(–light);border:1px solid var(–border);border-radius:20px;overflow:hidden;}
 .tabs-nav{display:flex;border-bottom:1px solid var(–light-3);padding:0 8px;}
 .tab-btn{
@@ -139,7 +139,7 @@ cursor:pointer;transition:all .2s;
 .brochure-btn:hover{background:var(–dark-2);}
 .no-brochure{color:var(–text-muted);font-size:13px;font-style:italic;}
 
-/* ── SIDEBAR ── */
+/* – SIDEBAR – */
 .sidebar{position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;}
 .sidebar-card{background:var(–light);border:1px solid var(–border);border-radius:20px;padding:24px;margin-bottom:16px;box-shadow:0 8px 24px rgba(10,4,35,0.06);}
 
@@ -371,12 +371,12 @@ cursor:pointer;transition:all .2s;border:none;
 </div>
 
 <script>
-// ── LISTINGS DATA ── (mirrors marketplace file)
+// -- LISTINGS DATA -- (mirrors marketplace file)
 const listings = [
   {
     id: 1,
     slug: 'bluewaters-residences-tower-6',
-    project: 'Bluewaters Residences — Tower 6',
+    project: 'Bluewaters Residences -- Tower 6',
     location: 'Bluewaters Island, Dubai',
     status: 'Ready',
     featured: true,
@@ -408,7 +408,7 @@ const listings = [
   {
     id: 2,
     slug: 'creek-waters-2-unit-1204',
-    project: 'Creek Waters 2 — Unit 1204',
+    project: 'Creek Waters 2 -- Unit 1204',
     location: 'Dubai Creek Harbour',
     status: 'Off-Plan',
     featured: false,
@@ -439,7 +439,7 @@ const listings = [
   {
     id: 3,
     slug: 'damac-hills-golf-facing-villa',
-    project: 'Damac Hills — Golf Facing Villa',
+    project: 'Damac Hills -- Golf Facing Villa',
     location: 'Damac Hills, Dubai',
     status: 'Ready',
     featured: false,
@@ -470,7 +470,7 @@ const listings = [
   {
     id: 4,
     slug: 'marina-gate-i-high-floor',
-    project: 'Marina Gate I — High Floor',
+    project: 'Marina Gate I -- High Floor',
     location: 'Dubai Marina',
     status: 'Ready',
     featured: false,
@@ -501,7 +501,7 @@ const listings = [
   {
     id: 5,
     slug: 'address-residences-the-bay',
-    project: 'Address Residences — The Bay',
+    project: 'Address Residences -- The Bay',
     location: 'Downtown Dubai',
     status: 'Ready',
     featured: false,
@@ -531,7 +531,7 @@ const listings = [
   }
 ];
 
-// ── INIT ──
+// -- INIT --
 const params = new URLSearchParams(window.location.search);
 const slug = params.get('deal');
 const listing = listings.find(l => l.slug === slug) || listings[0];
@@ -545,7 +545,7 @@ function populate(){
   // Hero
   document.getElementById('heroImg').style.background = listing.bg;
   document.getElementById('heroImg').innerHTML = listing.emoji;
-  document.title = `Fursah — ${listing.project}`;
+  document.title = `Fursah -- ${listing.project}`;
 
   // Topbar badges
   document.getElementById('topbarBadges').innerHTML = `
@@ -613,7 +613,7 @@ function populate(){
     </div>
     <div class="pc-item">
       <div class="pc-label">Building Avg</div>
-      <div class="pc-val">${listing.buildingPsf || '—'}</div>
+      <div class="pc-val">${listing.buildingPsf || '--'}</div>
     </div>
     <div class="pc-item">
       <div class="pc-label">Area Avg</div>
@@ -641,7 +641,7 @@ function populate(){
        <div class="brochure-title">No Brochure Available</div>
        <div class="brochure-desc no-brochure">The listing agent has not uploaded a brochure for this property yet.</div>`;
 
-  // SIDEBAR — Price card
+  // SIDEBAR -- Price card
   document.getElementById('sidebarPriceCard').innerHTML = `
     <div class="price-card-label">Asking Price</div>
     <div class="price-card-amount">${listing.askingPrice}</div>
@@ -654,7 +654,7 @@ function populate(){
     </div>
   `;
 
-  // SIDEBAR — Agent
+  // SIDEBAR -- Agent
   document.getElementById('sidebarAgent').innerHTML = `
     <div class="agent-av">${listing.agentInitials}</div>
     <div class="agent-info">
@@ -666,12 +666,12 @@ function populate(){
     window.open(`https://wa.me/${listing.agentPhone}?text=Hi, I'm interested in ${listing.project} listed on Fursah.`);
   };
 
-  // SIDEBAR — Commission
+  // SIDEBAR -- Commission
   const commVal = document.getElementById('commissionVal');
   commVal.textContent = listing.commissionCovered ? 'Covered by Seller' : 'Not Covered';
   commVal.className = 'commission-val ' + (listing.commissionCovered ? 'yes' : 'no');
 
-  // SIDEBAR — Quick specs
+  // SIDEBAR -- Quick specs
   document.getElementById('sidebarSpecs').innerHTML = `
     <div class="ss-item"><div class="ss-val">${listing.beds}</div><div class="ss-label">Beds</div></div>
     <div class="ss-item"><div class="ss-val">${listing.baths}</div><div class="ss-label">Baths</div></div>
@@ -685,7 +685,7 @@ function populate(){
   document.getElementById('modalListingName').textContent = listing.project + ' · ' + listing.askingPrice;
 }
 
-// ── TABS ──
+// -- TABS --
 function switchTab(id, btn){
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -693,7 +693,7 @@ function switchTab(id, btn){
   btn.classList.add('active');
 }
 
-// ── OFFER MODAL ──
+// -- OFFER MODAL --
 function openOfferModal(){ document.getElementById('offerModal').classList.add('open'); }
 function closeOfferModal(){ document.getElementById('offerModal').classList.remove('open'); }
 function submitOffer(){
